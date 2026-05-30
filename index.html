@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Parcours · Learn French A1 → C1</title>
+<style>html,body{margin:0;padding:0;background:#f4efe6}#root{min-height:100vh}</style>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef, useCallback } = React;
+
+/* ============================================================
+   LE PARCOURS — A French course from A1 to C1
+   Editorial design · multi-mode practice · challenge mode
+   ============================================================ */
+
+// ---------- CURRICULUM ----------
+// Each level → units → each unit has vocab, a grammar note, and an exercise set
+// Exercise kinds: flashcard (learn), translate (type FR), choice (multiple choice),
+// build (word-order), listen (type what you hear), conjugate (fill verb form)
+
+const CURRICULUM = [
+  {
+    level: "A1", name: "Les Fondations", sub: "Absolute beginner",
+    desc: "Sounds, greetings, essential verbs and survival phrases.",
+    units: [
+      {
+        id: "a1-greet", title: "Premiers mots", focus: "Greetings & courtesy",
+        grammar: { t: "Tu vs. Vous", b: "French has two ways to say “you.” Use tu with friends, family and children; use vous for strangers, elders and formal settings, and always for groups." },
+        vocab: [
+          { fr: "Bonjour", en: "Hello / Good day", ipa: "bɔ̃ʒuʁ" },
+          { fr: "Bonsoir", en: "Good evening", ipa: "bɔ̃swaʁ" },
+          { fr: "Enchanté", en: "Pleased to meet you", ipa: "ɑ̃ʃɑ̃te" },
+          { fr: "S'il vous plaît", en: "Please (formal)", ipa: "sil vu plɛ" },
+          { fr: "Je vous en prie", en: "You're welcome (formal)", ipa: "ʒə vu zɑ̃ pʁi" },
+        ],
+        ex: [
+          { k: "choice", q: "Which greeting fits a job interview?", a: "Bonjour", opts: ["Salut", "Bonjour", "Coucou"] },
+          { k: "translate", q: "Pleased to meet you", a: "Enchanté" },
+          { k: "listen", a: "Bonsoir", q: "Type what you hear" },
+          { k: "choice", q: "“You're welcome”, formal:", a: "Je vous en prie", opts: ["De rien", "Je vous en prie", "Pas de souci"] },
+        ],
+      },
+      {
+        id: "a1-be", title: "Être & Avoir", focus: "The two key verbs",
+        grammar: { t: "Être (to be) & Avoir (to have)", b: "These power most of French. Être: je suis, tu es, il/elle est, nous sommes, vous êtes, ils/elles sont. Avoir: j'ai, tu as, il/elle a, nous avons, vous avez, ils/elles ont." },
+        vocab: [
+          { fr: "Je suis", en: "I am", ipa: "ʒə sɥi" },
+          { fr: "Tu es", en: "You are", ipa: "ty ɛ" },
+          { fr: "J'ai", en: "I have", ipa: "ʒe" },
+          { fr: "Nous sommes", en: "We are", ipa: "nu sɔm" },
+          { fr: "Ils ont", en: "They have", ipa: "il zɔ̃" },
+        ],
+        ex: [
+          { k: "conjugate", q: "____ (être) fatigué.", subj: "Je", a: "suis", verb: "être" },
+          { k: "conjugate", q: "Nous ____ (avoir) faim.", subj: "Nous", a: "avons", verb: "avoir" },
+          { k: "choice", q: "“They are happy” →", a: "Ils sont contents", opts: ["Ils ont contents", "Ils sont contents", "Ils est content"] },
+          { k: "translate", q: "I have a cat (un chat)", a: "J'ai un chat" },
+        ],
+      },
+      {
+        id: "a1-num", title: "Nombres & Temps", focus: "Numbers, days, time",
+        grammar: { t: "Telling time", b: "Use “il est” + hour: Il est trois heures (3:00). Add minutes directly: Il est trois heures dix (3:10). “et quart” = quarter past, “et demie” = half past." },
+        vocab: [
+          { fr: "Quinze", en: "Fifteen", ipa: "kɛ̃z" },
+          { fr: "Vingt", en: "Twenty", ipa: "vɛ̃" },
+          { fr: "Aujourd'hui", en: "Today", ipa: "oʒuʁdɥi" },
+          { fr: "Demain", en: "Tomorrow", ipa: "dəmɛ̃" },
+          { fr: "Il est midi", en: "It's noon", ipa: "il ɛ midi" },
+        ],
+        ex: [
+          { k: "translate", q: "Twenty", a: "Vingt" },
+          { k: "choice", q: "“Half past” is…", a: "et demie", opts: ["et quart", "et demie", "moins le quart"] },
+          { k: "listen", a: "Demain", q: "Type what you hear" },
+          { k: "build", q: "Build: “It's noon”", a: "Il est midi", tiles: ["midi", "Il", "est"] },
+        ],
+      },
+    ],
+  },
+  {
+    level: "A2", name: "La Vie Quotidienne", sub: "Elementary",
+    desc: "Daily routines, the past tense, and getting things done.",
+    units: [
+      {
+        id: "a2-er", title: "Verbes en -ER", focus: "Present tense regulars",
+        grammar: { t: "-ER verbs", b: "Most French verbs end in -ER. Drop -er and add: -e, -es, -e, -ons, -ez, -ent. Parler → je parle, tu parles, il parle, nous parlons, vous parlez, ils parlent." },
+        vocab: [
+          { fr: "Parler", en: "To speak", ipa: "paʁle" },
+          { fr: "Manger", en: "To eat", ipa: "mɑ̃ʒe" },
+          { fr: "Travailler", en: "To work", ipa: "tʁavaje" },
+          { fr: "Habiter", en: "To live (reside)", ipa: "abite" },
+          { fr: "Écouter", en: "To listen", ipa: "ekute" },
+        ],
+        ex: [
+          { k: "conjugate", q: "Nous ____ (parler) français.", subj: "Nous", a: "parlons", verb: "parler" },
+          { k: "conjugate", q: "Tu ____ (habiter) à Lyon.", subj: "Tu", a: "habites", verb: "habiter" },
+          { k: "translate", q: "I eat bread (du pain)", a: "Je mange du pain" },
+          { k: "choice", q: "“They work” →", a: "Ils travaillent", opts: ["Ils travaillez", "Ils travaillent", "Ils travailles"] },
+        ],
+      },
+      {
+        id: "a2-passe", title: "Le Passé Composé", focus: "Talking about the past",
+        grammar: { t: "Passé composé", b: "Formed with avoir/être (present) + past participle. -ER verbs → -é: J'ai mangé (I ate). Movement/state verbs use être: Je suis allé (I went), and the participle agrees with the subject." },
+        vocab: [
+          { fr: "J'ai mangé", en: "I ate", ipa: "ʒe mɑ̃ʒe" },
+          { fr: "Je suis allé", en: "I went", ipa: "ʒə sɥi zale" },
+          { fr: "Tu as vu", en: "You saw", ipa: "ty a vy" },
+          { fr: "Nous avons fini", en: "We finished", ipa: "nu zavɔ̃ fini" },
+          { fr: "Hier", en: "Yesterday", ipa: "jɛʁ" },
+        ],
+        ex: [
+          { k: "translate", q: "I ate (passé composé)", a: "J'ai mangé" },
+          { k: "build", q: "Build: “We finished”", a: "Nous avons fini", tiles: ["fini", "Nous", "avons"] },
+          { k: "choice", q: "“I went” uses…", a: "être", opts: ["avoir", "être", "faire"] },
+          { k: "listen", a: "Hier", q: "Type what you hear" },
+        ],
+      },
+      {
+        id: "a2-shop", title: "Au Marché", focus: "Shopping & quantities",
+        grammar: { t: "Partitive articles", b: "“Some” changes with gender/number: du (masc), de la (fem), de l' (vowel), des (plural). Je voudrais du fromage, de la confiture, des œufs." },
+        vocab: [
+          { fr: "Je voudrais", en: "I would like", ipa: "ʒə vudʁɛ" },
+          { fr: "Combien ça coûte", en: "How much is it", ipa: "kɔ̃bjɛ̃ sa kut" },
+          { fr: "Un kilo de", en: "A kilo of", ipa: "œ̃ kilo də" },
+          { fr: "Trop cher", en: "Too expensive", ipa: "tʁo ʃɛʁ" },
+          { fr: "La monnaie", en: "Change (money)", ipa: "la mɔnɛ" },
+        ],
+        ex: [
+          { k: "choice", q: "“Some cheese (le fromage)” →", a: "du fromage", opts: ["de la fromage", "du fromage", "des fromage"] },
+          { k: "translate", q: "I would like", a: "Je voudrais" },
+          { k: "choice", q: "“Some water (l'eau)” →", a: "de l'eau", opts: ["du eau", "de l'eau", "des eau"] },
+          { k: "build", q: "Build: “How much is it”", a: "Combien ça coûte", tiles: ["ça", "Combien", "coûte"] },
+        ],
+      },
+    ],
+  },
+  {
+    level: "B1", name: "L'Indépendance", sub: "Intermediate",
+    desc: "Express opinions, the future, and handle the unexpected.",
+    units: [
+      {
+        id: "b1-fut", title: "Le Futur Simple", focus: "Future plans",
+        grammar: { t: "Futur simple", b: "Add endings to the infinitive: -ai, -as, -a, -ons, -ez, -ont. Parler → je parlerai. Common irregulars: être→ser-, avoir→aur-, aller→ir-, faire→fer-." },
+        vocab: [
+          { fr: "Je serai", en: "I will be", ipa: "ʒə səʁe" },
+          { fr: "Nous irons", en: "We will go", ipa: "nu ziʁɔ̃" },
+          { fr: "Demain matin", en: "Tomorrow morning", ipa: "dəmɛ̃ matɛ̃" },
+          { fr: "Peut-être", en: "Maybe", ipa: "pø tɛtʁ" },
+          { fr: "Bientôt", en: "Soon", ipa: "bjɛ̃to" },
+        ],
+        ex: [
+          { k: "conjugate", q: "Je ____ (être) prêt demain.", subj: "Je", a: "serai", verb: "être (futur)" },
+          { k: "conjugate", q: "Nous ____ (aller) à Paris.", subj: "Nous", a: "irons", verb: "aller (futur)" },
+          { k: "translate", q: "Maybe", a: "Peut-être" },
+          { k: "choice", q: "Future of “faire” (je) →", a: "ferai", opts: ["faisai", "ferai", "fairai"] },
+        ],
+      },
+      {
+        id: "b1-op", title: "Donner son Avis", focus: "Opinions & the subjunctive door",
+        grammar: { t: "Que + opinion", b: "Opinions use “que”: Je pense que… (I think that), Je trouve que… (I find that). After doubt/wish/emotion verbs you'll later switch to the subjunctive — but je pense que takes the indicative." },
+        vocab: [
+          { fr: "Je pense que", en: "I think that", ipa: "ʒə pɑ̃s kə" },
+          { fr: "À mon avis", en: "In my opinion", ipa: "a mɔ̃ navi" },
+          { fr: "Je suis d'accord", en: "I agree", ipa: "ʒə sɥi dakɔʁ" },
+          { fr: "Cependant", en: "However", ipa: "səpɑ̃dɑ̃" },
+          { fr: "En revanche", en: "On the other hand", ipa: "ɑ̃ ʁəvɑ̃ʃ" },
+        ],
+        ex: [
+          { k: "translate", q: "In my opinion", a: "À mon avis" },
+          { k: "choice", q: "A contrast connector:", a: "Cependant", opts: ["Donc", "Cependant", "Aussi"] },
+          { k: "build", q: "Build: “I think that…”", a: "Je pense que", tiles: ["que", "Je", "pense"] },
+          { k: "listen", a: "En revanche", q: "Type what you hear" },
+        ],
+      },
+    ],
+  },
+  {
+    level: "B2", name: "La Nuance", sub: "Upper-intermediate",
+    desc: "The subjunctive, hypotheticals, and sounding natural.",
+    units: [
+      {
+        id: "b2-subj", title: "Le Subjonctif", focus: "Necessity, emotion, doubt",
+        grammar: { t: "Subjunctive", b: "Triggered by necessity, wish, emotion, doubt — usually after “que.” Il faut que je fasse (I must do). Forms often use the ils-stem + -e, -es, -e, -ions, -iez, -ent. Key irregulars: faire→fasse, être→sois, avoir→aie, aller→aille." },
+        vocab: [
+          { fr: "Il faut que", en: "It's necessary that", ipa: "il fo kə" },
+          { fr: "Bien que", en: "Although", ipa: "bjɛ̃ kə" },
+          { fr: "Pour que", en: "So that", ipa: "puʁ kə" },
+          { fr: "Je doute que", en: "I doubt that", ipa: "ʒə dut kə" },
+          { fr: "Avant que", en: "Before", ipa: "avɑ̃ kə" },
+        ],
+        ex: [
+          { k: "conjugate", q: "Il faut que je ____ (faire) ça.", subj: "que je", a: "fasse", verb: "faire (subj)" },
+          { k: "conjugate", q: "Bien qu'il ____ (être) tard.", subj: "qu'il", a: "soit", verb: "être (subj)" },
+          { k: "choice", q: "Which triggers subjunctive?", a: "Il faut que", opts: ["Je sais que", "Il faut que", "Je pense que"] },
+          { k: "translate", q: "Although (conjunction)", a: "Bien que" },
+        ],
+      },
+      {
+        id: "b2-cond", title: "Le Conditionnel", focus: "Hypotheticals & politeness",
+        grammar: { t: "Si clauses", b: "“If” sentences pair tenses: Si + imparfait → conditionnel. Si j'avais le temps, je voyagerais (If I had time, I would travel). The conditional uses the future stem + imparfait endings." },
+        vocab: [
+          { fr: "Je voudrais", en: "I would like", ipa: "ʒə vudʁɛ" },
+          { fr: "Je pourrais", en: "I could", ipa: "ʒə puʁɛ" },
+          { fr: "Si j'avais", en: "If I had", ipa: "si ʒavɛ" },
+          { fr: "Ce serait", en: "It would be", ipa: "sə səʁɛ" },
+          { fr: "Vraiment", en: "Really", ipa: "vʁɛmɑ̃" },
+        ],
+        ex: [
+          { k: "build", q: "Build: “If I had time” (le temps)", a: "Si j'avais le temps", tiles: ["le", "temps", "Si", "j'avais"] },
+          { k: "conjugate", q: "Je ____ (pouvoir, cond.) aider.", subj: "Je", a: "pourrais", verb: "pouvoir (cond)" },
+          { k: "translate", q: "It would be", a: "Ce serait" },
+          { k: "choice", q: "Si + imparfait pairs with…", a: "conditionnel", opts: ["futur", "conditionnel", "présent"] },
+        ],
+      },
+    ],
+  },
+  {
+    level: "C1", name: "La Maîtrise", sub: "Advanced",
+    desc: "Idioms, register, and the literary edge of French.",
+    units: [
+      {
+        id: "c1-idiom", title: "Expressions Idiomatiques", focus: "Native-level color",
+        grammar: { t: "Idioms ≠ literal", b: "French idioms rarely translate word-for-word. “Coûter les yeux de la tête” = to cost a fortune (lit. cost the eyes of the head). Learn them as whole units, not parts." },
+        vocab: [
+          { fr: "Avoir le cafard", en: "To feel down (the blues)", ipa: "avwaʁ lə kafaʁ" },
+          { fr: "Poser un lapin", en: "To stand someone up", ipa: "poze œ̃ lapɛ̃" },
+          { fr: "Mettre son grain de sel", en: "To put in one's two cents", ipa: "mɛtʁ sɔ̃ ɡʁɛ̃ də sɛl" },
+          { fr: "Tomber dans les pommes", en: "To faint", ipa: "tɔ̃be dɑ̃ le pɔm" },
+          { fr: "Avoir un coup de foudre", en: "Love at first sight", ipa: "avwaʁ œ̃ ku də fudʁ" },
+        ],
+        ex: [
+          { k: "choice", q: "“Poser un lapin” means…", a: "To stand someone up", opts: ["To cook rabbit", "To stand someone up", "To be quick"] },
+          { k: "choice", q: "To faint →", a: "Tomber dans les pommes", opts: ["Tomber dans les pommes", "Avoir le cafard", "Casser les pieds"] },
+          { k: "translate", q: "Love at first sight (idiom)", a: "Avoir un coup de foudre" },
+          { k: "choice", q: "“Avoir le cafard” =", a: "To feel down", opts: ["To be hungry", "To feel down", "To be lucky"] },
+        ],
+      },
+      {
+        id: "c1-reg", title: "Registre & Style", focus: "Formal vs. literary",
+        grammar: { t: "Passé simple", b: "The passé simple is the literary past tense, found in novels and history — never in speech. -ER verbs: il parla, ils parlèrent. You should recognise it, even if you use passé composé when speaking." },
+        vocab: [
+          { fr: "Néanmoins", en: "Nevertheless", ipa: "neɑ̃mwɛ̃" },
+          { fr: "Désormais", en: "From now on", ipa: "dezɔʁmɛ" },
+          { fr: "Il parla", en: "He spoke (literary)", ipa: "il paʁla" },
+          { fr: "Quoique", en: "Even though", ipa: "kwakə" },
+          { fr: "Toutefois", en: "However (formal)", ipa: "tutfwa" },
+        ],
+        ex: [
+          { k: "translate", q: "Nevertheless", a: "Néanmoins" },
+          { k: "choice", q: "“Il parla” is which tense?", a: "Passé simple", opts: ["Passé composé", "Passé simple", "Imparfait"] },
+          { k: "choice", q: "Most formal “however”:", a: "Toutefois", opts: ["Mais", "Toutefois", "Mais bon"] },
+          { k: "listen", a: "Désormais", q: "Type what you hear" },
+        ],
+      },
+    ],
+  },
+];
+
+// daily phrase pool (intermediate, real sentences)
+const DAILY = [
+  { fr: "Petit à petit, l'oiseau fait son nid.", en: "Little by little, the bird builds its nest. (Slow and steady wins.)" },
+  { fr: "Il ne faut pas mettre la charrue avant les bœufs.", en: "Don't put the cart before the horse." },
+  { fr: "Qui vivra verra.", en: "Time will tell. (Who lives, will see.)" },
+  { fr: "L'habit ne fait pas le moine.", en: "Clothes don't make the man." },
+  { fr: "Mieux vaut tard que jamais.", en: "Better late than never." },
+  { fr: "C'est en forgeant qu'on devient forgeron.", en: "Practice makes perfect." },
+  { fr: "Les murs ont des oreilles.", en: "The walls have ears." },
+  { fr: "Vouloir, c'est pouvoir.", en: "Where there's a will, there's a way." },
+];
+
+// ---------- HELPERS ----------
+const norm = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9' ]/g, "").replace(/\s+/g, " ").trim();
+const dayIdx = () => Math.floor((Date.now() - new Date(2024, 0, 1)) / 864e5);
+const shuffle = (a) => [...a].sort(() => Math.random() - 0.5);
+
+function speak(text) {
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "fr-FR"; u.rate = 0.88;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+const allUnits = CURRICULUM.flatMap((lv) => lv.units.map((u) => ({ ...u, level: lv.level })));
+
+// ---------- SMALL UI ----------
+function Speaker({ text, big }) {
+  return (
+    <button className={`spk ${big ? "big" : ""}`} onClick={(e) => { e.stopPropagation(); speak(text); }} title="Écouter" aria-label="Listen">
+      <svg viewBox="0 0 24 24" width={big ? 20 : 15} height={big ? 20 : 15} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.5 8.5a5 5 0 0 1 0 7" /><path d="M19 5a10 10 0 0 1 0 14" />
+      </svg>
+    </button>
+  );
+}
+
+// ---------- EXERCISE ENGINE ----------
+function Exercise({ item, onResult }) {
+  const [val, setVal] = useState("");
+  const [picked, setPicked] = useState(null);
+  const [order, setOrder] = useState([]);
+  const [pool, setPool] = useState(() => (item.k === "build" ? shuffle(item.tiles) : []));
+  const [status, setStatus] = useState("idle"); // idle | right | wrong
+  const inp = useRef(null);
+
+  useEffect(() => {
+    setVal(""); setPicked(null); setOrder([]); setStatus("idle");
+    setPool(item.k === "build" ? shuffle(item.tiles) : []);
+    if (item.k === "listen") setTimeout(() => speak(item.a), 350);
+    setTimeout(() => inp.current && inp.current.focus(), 60);
+  }, [item]);
+
+  const settle = (ok) => { setStatus(ok ? "right" : "wrong"); if (ok) speak(item.a); onResult(ok); };
+
+  const submit = () => {
+    if (status !== "idle") return;
+    if (item.k === "choice") { if (picked == null) return; settle(picked === item.a); }
+    else if (item.k === "build") { settle(order.join(" ") === item.a); }
+    else { settle(norm(val) === norm(item.a)); }
+  };
+
+  const tag = { flashcard: "Learn", translate: "Translate", choice: "Choose", build: "Word order", listen: "Listening", conjugate: "Conjugate" }[item.k];
+
+  return (
+    <div className="ex">
+      <div className="ex-tagrow">
+        <span className="ex-tag">{tag}</span>
+        {item.verb && <span className="ex-verb">{item.verb}</span>}
+      </div>
+
+      {item.k === "listen" ? (
+        <div className="listen-q">
+          <button className="replay" onClick={() => speak(item.a)}>
+            <Speaker text={item.a} big /> Replay audio
+          </button>
+        </div>
+      ) : (
+        <h3 className="ex-q">{item.q}{item.subj && <em> · subject: {item.subj}</em>}</h3>
+      )}
+
+      {item.k === "choice" && (
+        <div className="opts">
+          {item.opts.map((o) => (
+            <button key={o}
+              className={`opt ${picked === o ? "sel" : ""} ${status !== "idle" && o === item.a ? "correct" : ""} ${status === "wrong" && picked === o ? "bad" : ""}`}
+              disabled={status !== "idle"}
+              onClick={() => setPicked(o)}>{o}</button>
+          ))}
+        </div>
+      )}
+
+      {item.k === "build" && (
+        <>
+          <div className="build-line">
+            {order.length === 0 && <span className="build-ph">Tap the words in order…</span>}
+            {order.map((w, i) => (
+              <button key={i} className="tile placed" disabled={status !== "idle"}
+                onClick={() => { setOrder(order.filter((_, j) => j !== i)); setPool([...pool, w]); }}>{w}</button>
+            ))}
+          </div>
+          <div className="build-pool">
+            {pool.map((w, i) => (
+              <button key={i} className="tile" disabled={status !== "idle"}
+                onClick={() => { setOrder([...order, w]); setPool(pool.filter((_, j) => j !== i)); }}>{w}</button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {(item.k === "translate" || item.k === "conjugate" || item.k === "listen") && (
+        <input ref={inp} className={`field ${status}`} value={val}
+          placeholder={item.k === "conjugate" ? "verb form…" : "ta réponse…"}
+          disabled={status !== "idle"}
+          onChange={(e) => setVal(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()} />
+      )}
+
+      {status === "idle" ? (
+        <button className="cta" onClick={submit}>Check answer</button>
+      ) : (
+        <div className={`verdict ${status}`}>
+          <span>
+            {status === "right" ? "Correct — " : "Answer: "}
+            <strong>{item.a}</strong> <Speaker text={item.a} />
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- UNIT (lesson flow) ----------
+function Unit({ unit, onBack, onComplete, awardXP }) {
+  const [stage, setStage] = useState("study"); // study | drill | done
+  const [vi, setVi] = useState(0);
+  const [reveal, setReveal] = useState(false);
+  const seq = useMemo(() => shuffle(unit.ex), [unit.id]);
+  const [ei, setEi] = useState(0);
+  const [correct, setCorrect] = useState(0);
+  const [streak, setStreak] = useState(0);
+
+  useEffect(() => { setStage("study"); setVi(0); setReveal(false); setEi(0); setCorrect(0); setStreak(0); }, [unit.id]);
+
+  const card = unit.vocab[vi];
+  const exItem = seq[ei];
+
+  const handleResult = (ok) => {
+    if (ok) { setCorrect((c) => c + 1); setStreak((s) => s + 1); awardXP(10 + Math.min(streak, 5) * 2); }
+    else setStreak(0);
+  };
+
+  const advanceEx = () => {
+    if (ei + 1 < seq.length) setEi(ei + 1);
+    else { const score = Math.round((correct / seq.length) * 100); onComplete(unit.id, score); awardXP(40); setStage("done"); }
+  };
+
+  return (
+    <div className="unit">
+      <button className="back" onClick={onBack}>← Le parcours</button>
+      <div className="unit-banner">
+        <span className="lvtag">{unit.level}</span>
+        <h2>{unit.title}</h2>
+        <p>{unit.focus}</p>
+      </div>
+
+      <div className="steps">
+        <span className={stage === "study" ? "on" : ""}>1 · Study</span>
+        <span className={stage === "drill" ? "on" : ""}>2 · Drill</span>
+        <span className={stage === "done" ? "on" : ""}>3 · Result</span>
+      </div>
+
+      {stage === "study" && (
+        <>
+          <div className="grammar">
+            <span className="g-label">Grammar</span>
+            <h4>{unit.grammar.t}</h4>
+            <p>{unit.grammar.b}</p>
+          </div>
+          <div className={`vcard ${reveal ? "rev" : ""}`} onClick={() => setReveal((r) => !r)}>
+            <Speaker text={card.fr} big />
+            <h3>{card.fr}</h3>
+            <p className="ipa">/{card.ipa}/</p>
+            <p className="vmean">{reveal ? card.en : "Tap to reveal meaning"}</p>
+          </div>
+          <div className="vnav">
+            <button className="ghost" disabled={vi === 0} onClick={() => { setVi(vi - 1); setReveal(false); }}>← Prev</button>
+            <span className="counter">{vi + 1} / {unit.vocab.length}</span>
+            {vi + 1 < unit.vocab.length
+              ? <button className="ghost" onClick={() => { setVi(vi + 1); setReveal(false); }}>Next →</button>
+              : <button className="cta sm" onClick={() => setStage("drill")}>Start drill →</button>}
+          </div>
+        </>
+      )}
+
+      {stage === "drill" && (
+        <>
+          <div className="drill-top">
+            <div className="bar"><div className="bar-f" style={{ width: `${(ei / seq.length) * 100}%` }} /></div>
+            <span className="counter">Q{ei + 1}/{seq.length} · 🔥{streak}</span>
+          </div>
+          <Exercise key={ei} item={exItem} onResult={handleResult} />
+          <button className="cta ghostnext" onClick={advanceEx}>
+            {ei + 1 < seq.length ? "Next question →" : "See result →"}
+          </button>
+        </>
+      )}
+
+      {stage === "done" && (
+        <div className="result">
+          <div className="score-ring" style={{ "--p": Math.round((correct / seq.length) * 100) }}>
+            <span>{Math.round((correct / seq.length) * 100)}%</span>
+          </div>
+          <h2>{correct === seq.length ? "Sans faute ! 🏅" : correct >= seq.length * 0.6 ? "Bien joué !" : "Keep going!"}</h2>
+          <p>You got {correct} of {seq.length} correct and earned XP for this unit.</p>
+          <div className="result-btns">
+            <button className="ghost" onClick={() => { setStage("study"); setVi(0); setEi(0); setCorrect(0); }}>Review again</button>
+            <button className="cta sm" onClick={onBack}>Back to path</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- CHALLENGE MODE ----------
+function Challenge({ onExit, awardXP }) {
+  const pool = useMemo(() => shuffle(allUnits.flatMap((u) => u.ex.filter((e) => e.k !== "flashcard"))).slice(0, 12), []);
+  const [i, setI] = useState(0);
+  const [lives, setLives] = useState(3);
+  const [score, setScore] = useState(0);
+  const [over, setOver] = useState(false);
+
+  const onResult = (ok) => {
+    if (ok) { setScore((s) => s + 1); awardXP(15); }
+    else { setLives((l) => l - 1); }
+  };
+  const next = () => {
+    if (lives <= 0) return;
+    if (i + 1 < pool.length) setI(i + 1); else setOver(true);
+  };
+  useEffect(() => { if (lives <= 0) setOver(true); }, [lives]);
+
+  if (over) {
+    return (
+      <div className="unit">
+        <div className="result">
+          <h2>{lives <= 0 ? "Game over" : "Défi terminé !"}</h2>
+          <p className="big-score">{score}<span> pts</span></p>
+          <p>{score >= 9 ? "Exceptional — that's near-fluent reflexes." : score >= 5 ? "Solid run. Push for the high score." : "Every champion starts somewhere."}</p>
+          <button className="cta sm" onClick={onExit}>Return home</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Quit challenge</button>
+      <div className="ch-hud">
+        <span className="hearts">{"♥".repeat(lives)}<span className="dim">{"♡".repeat(3 - lives)}</span></span>
+        <span className="ch-score">Score {score}</span>
+        <span className="counter">{i + 1}/{pool.length}</span>
+      </div>
+      <div className="ch-tag">CHALLENGE · mixed levels · no hints</div>
+      <Exercise key={i} item={pool[i]} onResult={onResult} />
+      <button className="cta ghostnext" onClick={next}>Continue →</button>
+    </div>
+  );
+}
+
+// ---------- DAILY ----------
+function Daily({ onExit, awardXP, claimed, claim }) {
+  const d = DAILY[dayIdx() % DAILY.length];
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Accueil</button>
+      <div className="daily-wrap">
+        <span className="daily-kicker">Expression du jour</span>
+        <h2 className="daily-fr">« {d.fr} »</h2>
+        <div className="daily-actions">
+          <Speaker text={d.fr} big />
+          <span className="daily-en">{d.en}</span>
+        </div>
+        {!claimed
+          ? <button className="cta" onClick={() => { claim(); awardXP(20); speak(d.fr); }}>Listen & claim +20 XP</button>
+          : <button className="cta done" disabled>✓ Claimed — revient demain</button>}
+      </div>
+    </div>
+  );
+}
+
+// ---------- APP ----------
+function App() {
+  const [route, setRoute] = useState({ name: "home" });
+  const [xp, setXp] = useState(0);
+  const [scores, setScores] = useState({}); // unitId -> best %
+  const [dailyClaimed, setDailyClaimed] = useState(false);
+  const [openLevel, setOpenLevel] = useState("A1");
+
+  const awardXP = useCallback((n) => setXp((x) => x + n), []);
+  const completeUnit = (id, score) => setScores((s) => ({ ...s, [id]: Math.max(s[id] || 0, score) }));
+
+  const totalUnits = allUnits.length;
+  const doneUnits = Object.keys(scores).length;
+  const level = Math.floor(xp / 150) + 1;
+  const levelProg = Math.round(((xp % 150) / 150) * 100);
+  const rankName = ["Débutant", "Apprenti", "Voyageur", "Causeur", "Éloquent", "Maître"][Math.min(level - 1, 5)];
+
+  const goUnit = (u) => setRoute({ name: "unit", unit: u });
+
+  return (
+    <div className="root">
+      <style>{CSS}</style>
+      <div className="grain" />
+
+      <header className="top">
+        <div className="logo" onClick={() => setRoute({ name: "home" })}>
+          <span className="mark">L</span>
+          <div><strong>Le Parcours</strong><em>Français · A1 → C1</em></div>
+        </div>
+        <div className="meta">
+          <div className="rank"><span>{rankName}</span><small>Niveau {level}</small></div>
+          <div className="xp-ring" style={{ "--p": levelProg }}><b>{xp}</b><small>XP</small></div>
+        </div>
+      </header>
+
+      {route.name === "home" && (
+        <main className="home">
+          <section className="hero">
+            <p className="eyebrow">Apprendre le français · du premier mot à la maîtrise</p>
+            <h1>Learn French properly — <span>from your first <em>bonjour</em> to fluent nuance.</span></h1>
+            <p className="lede">A structured path through five CEFR levels. Study real grammar, drill with six exercise types, then test your reflexes in challenge mode.</p>
+            <div className="hero-row">
+              <button className="cta" onClick={() => setRoute({ name: "challenge" })}>⚔ Challenge mode</button>
+              <button className="cta outline" onClick={() => setRoute({ name: "daily" })}>
+                {dailyClaimed ? "Today's expression" : "Expression du jour"}
+              </button>
+            </div>
+            <div className="hero-prog">
+              <div className="hp-bar"><div style={{ width: `${(doneUnits / totalUnits) * 100}%` }} /></div>
+              <span>{doneUnits} / {totalUnits} units mastered</span>
+            </div>
+          </section>
+
+          <div className="levels">
+            {CURRICULUM.map((lv) => {
+              const lvDone = lv.units.filter((u) => scores[u.id] != null).length;
+              const isOpen = openLevel === lv.level;
+              return (
+                <section key={lv.level} className={`lvl ${isOpen ? "open" : ""}`}>
+                  <button className="lvl-head" onClick={() => setOpenLevel(isOpen ? "" : lv.level)}>
+                    <span className="badge">{lv.level}</span>
+                    <div className="lvl-meta">
+                      <h2>{lv.name}</h2>
+                      <p>{lv.sub} — {lv.desc}</p>
+                    </div>
+                    <div className="lvl-side">
+                      <span className="lvl-frac">{lvDone}/{lv.units.length}</span>
+                      <span className="chev">{isOpen ? "−" : "+"}</span>
+                    </div>
+                  </button>
+                  {isOpen && (
+                    <div className="units">
+                      {lv.units.map((u, n) => {
+                        const sc = scores[u.id];
+                        return (
+                          <button key={u.id} className="unit-card" style={{ animationDelay: `${n * 60}ms` }}
+                            onClick={() => goUnit({ ...u, level: lv.level })}>
+                            <div className="uc-head">
+                              <h3>{u.title}</h3>
+                              {sc != null && <span className={`uc-score ${sc === 100 ? "perfect" : ""}`}>{sc}%</span>}
+                            </div>
+                            <p className="uc-focus">{u.focus}</p>
+                            <div className="uc-foot">
+                              <span>{u.vocab.length} words · {u.ex.length} drills</span>
+                              <span className="uc-go">Open →</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </section>
+              );
+            })}
+          </div>
+        </main>
+      )}
+
+      {route.name === "unit" && (
+        <main className="page">
+          <Unit unit={route.unit} onBack={() => setRoute({ name: "home" })} onComplete={completeUnit} awardXP={awardXP} />
+        </main>
+      )}
+      {route.name === "challenge" && (
+        <main className="page"><Challenge onExit={() => setRoute({ name: "home" })} awardXP={awardXP} /></main>
+      )}
+      {route.name === "daily" && (
+        <main className="page"><Daily onExit={() => setRoute({ name: "home" })} awardXP={awardXP} claimed={dailyClaimed} claim={() => setDailyClaimed(true)} /></main>
+      )}
+
+      <footer className="bottom">Le Parcours · built for serious, joyful study · <em>bon courage</em></footer>
+    </div>
+  );
+}
+
+// ---------- STYLES ----------
+const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Spline+Sans:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+.root{
+  --paper:#f4efe6; --ink:#1f1b16; --soft:#6b6258; --line:#e0d8c8;
+  --card:#fbf8f1; --rouge:#c1432b; --bleu:#2f4a7c; --or:#c79a3a; --vert:#3d6b53;
+  --shadow:0 18px 50px rgba(60,45,25,.10);
+  font-family:'Spline Sans',system-ui,sans-serif; color:var(--ink);
+  background:var(--paper); min-height:100vh; position:relative; overflow-x:hidden;
+}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background-image:radial-gradient(circle at 15% 20%,#efe6d2 0,transparent 45%),radial-gradient(circle at 85% 10%,#e7e9df 0,transparent 40%),radial-gradient(circle at 60% 95%,#f0e2d6 0,transparent 45%);}
+h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:500;letter-spacing:-.01em}
+em{font-style:italic}
+button{font-family:inherit;cursor:pointer}
+
+.top{position:sticky;top:0;z-index:30;display:flex;justify-content:space-between;align-items:center;
+  padding:14px 26px;max-width:1000px;margin:0 auto;
+  background:rgba(244,239,230,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.logo{display:flex;gap:12px;align-items:center;background:none;border:none}
+.mark{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;
+  background:var(--rouge);color:#fff;font-family:'Fraunces',serif;font-size:24px;
+  box-shadow:0 6px 18px rgba(193,67,43,.32)}
+.logo strong{font-family:'Fraunces',serif;font-size:18px;display:block;line-height:1}
+.logo em{font-size:11px;color:var(--soft);font-style:normal;letter-spacing:.04em;text-transform:uppercase}
+.meta{display:flex;gap:16px;align-items:center}
+.rank{text-align:right}
+.rank span{font-family:'Fraunces',serif;font-size:15px;display:block}
+.rank small{font-size:11px;color:var(--soft)}
+.xp-ring{--p:0;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;text-align:center;
+  background:conic-gradient(var(--or) calc(var(--p)*1%),var(--line) 0);position:relative}
+.xp-ring::before{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--paper)}
+.xp-ring b,.xp-ring small{position:relative;z-index:1;line-height:1}
+.xp-ring b{font-size:14px}.xp-ring small{font-size:9px;color:var(--soft)}
+
+main{max-width:1000px;margin:0 auto;padding:30px 26px 50px;position:relative;z-index:1}
+.page{max-width:760px}
+
+.hero{padding:20px 0 36px;border-bottom:1px solid var(--line);margin-bottom:34px}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--rouge);font-weight:600;margin-bottom:18px}
+.hero h1{font-size:clamp(32px,5vw,52px);line-height:1.05;max-width:760px}
+.hero h1 span{color:var(--bleu)}
+.lede{color:var(--soft);font-size:17px;max-width:580px;margin:20px 0 24px;line-height:1.55}
+.hero-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.hero-prog{display:flex;align-items:center;gap:14px}
+.hp-bar{flex:1;max-width:340px;height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.hp-bar div{height:100%;background:linear-gradient(90deg,var(--vert),var(--or));transition:width .6s}
+.hero-prog span{font-size:13px;color:var(--soft)}
+
+.cta{background:var(--ink);color:var(--paper);border:1px solid var(--ink);border-radius:11px;
+  padding:13px 22px;font-weight:600;font-size:15px;transition:transform .14s,background .2s}
+.cta:hover{transform:translateY(-2px);background:var(--rouge);border-color:var(--rouge)}
+.cta:disabled{opacity:.6;transform:none;cursor:default}
+.cta.outline{background:transparent;color:var(--ink)}
+.cta.outline:hover{background:var(--ink);color:var(--paper)}
+.cta.sm{padding:11px 18px;font-size:14px}
+.cta.done{background:var(--vert);border-color:var(--vert)}
+.ghost{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:11px;padding:11px 18px;font-weight:600;font-size:14px;transition:.15s}
+.ghost:hover:not(:disabled){border-color:var(--ink)}
+.ghost:disabled{opacity:.4;cursor:default}
+.ghostnext{margin-top:16px;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.ghostnext:hover{border-color:var(--ink);background:var(--card);transform:none}
+
+.levels{display:flex;flex-direction:column;gap:14px}
+.lvl{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:box-shadow .2s}
+.lvl.open{box-shadow:var(--shadow)}
+.lvl-head{width:100%;display:flex;align-items:center;gap:18px;padding:20px 22px;background:none;border:none;text-align:left}
+.badge{width:46px;height:46px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;
+  font-family:'Fraunces',serif;font-size:18px;background:var(--bleu);color:#fff}
+.lvl:nth-child(2) .badge{background:var(--vert)}
+.lvl:nth-child(3) .badge{background:var(--or)}
+.lvl:nth-child(4) .badge{background:var(--rouge)}
+.lvl:nth-child(5) .badge{background:var(--ink)}
+.lvl-meta{flex:1}
+.lvl-meta h2{font-size:21px}
+.lvl-meta p{font-size:13px;color:var(--soft);margin-top:3px}
+.lvl-side{display:flex;align-items:center;gap:14px}
+.lvl-frac{font-size:13px;color:var(--soft);font-variant-numeric:tabular-nums}
+.chev{font-size:22px;color:var(--soft);width:20px;text-align:center}
+.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;padding:0 18px 20px}
+.unit-card{text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:16px;
+  display:flex;flex-direction:column;gap:7px;transition:transform .16s,border-color .16s;opacity:0;animation:rise .45s forwards}
+.unit-card:hover{transform:translateY(-3px);border-color:var(--ink)}
+.uc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.uc-head h3{font-size:17px;line-height:1.2}
+.uc-score{font-size:12px;font-weight:700;color:var(--vert);background:#e7efe8;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.uc-score.perfect{color:#fff;background:var(--or)}
+.uc-focus{font-size:13px;color:var(--soft)}
+.uc-foot{display:flex;justify-content:space-between;font-size:11px;color:var(--soft);margin-top:4px}
+.uc-go{color:var(--rouge);font-weight:600}
+
+.back{background:none;border:none;color:var(--rouge);font-weight:600;font-size:14px;margin-bottom:18px}
+.unit-banner{margin-bottom:22px}
+.lvtag{font-size:12px;letter-spacing:.1em;color:var(--soft);font-weight:600}
+.unit-banner h2{font-size:30px;margin:5px 0 3px}
+.unit-banner p{color:var(--soft)}
+.steps{display:flex;gap:8px;margin-bottom:26px;font-size:12px;color:var(--soft)}
+.steps span{padding:6px 13px;border:1px solid var(--line);border-radius:99px;background:var(--card);font-weight:600}
+.steps span.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+.grammar{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--bleu);
+  border-radius:12px;padding:18px 20px;margin-bottom:20px}
+.g-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--bleu);font-weight:700}
+.grammar h4{font-size:18px;margin:6px 0 8px}
+.grammar p{font-size:14px;color:var(--soft);line-height:1.6}
+
+.vcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:38px 24px;text-align:center;
+  position:relative;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s}
+.vcard:hover{transform:translateY(-2px)}
+.vcard h3{font-size:36px;margin-bottom:4px}
+.ipa{color:var(--bleu);font-size:14px;font-family:'Spline Sans';margin-bottom:14px}
+.vmean{color:var(--soft);font-size:16px;min-height:22px}
+.vcard.rev .vmean{color:var(--ink);font-weight:600;font-family:'Fraunces',serif}
+.vnav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+.counter{font-size:13px;color:var(--soft);font-variant-numeric:tabular-nums}
+
+.spk{background:var(--paper);border:1px solid var(--line);color:var(--rouge);border-radius:50%;
+  width:30px;height:30px;display:inline-grid;place-items:center;transition:.15s;vertical-align:middle}
+.spk:hover{background:var(--rouge);color:#fff}
+.spk.big{width:42px;height:42px;position:absolute;top:16px;right:16px}
+.daily-actions .spk.big,.listen-q .spk.big,.replay .spk.big{position:static}
+
+.drill-top{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.bar{flex:1;height:7px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar-f{height:100%;background:var(--rouge);transition:width .4s}
+
+.ex{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:var(--shadow)}
+.ex-tagrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.ex-tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--rouge);font-weight:700}
+.ex-verb{font-size:12px;color:var(--soft);font-style:italic}
+.ex-q{font-size:22px;line-height:1.3;margin-bottom:18px}
+.ex-q em{font-size:14px;color:var(--soft);font-weight:400}
+.listen-q{margin-bottom:18px}
+.replay{display:flex;align-items:center;gap:10px;background:var(--paper);border:1px dashed var(--bleu);
+  color:var(--bleu);border-radius:12px;padding:16px 20px;font-weight:600;font-size:15px;width:100%;justify-content:center}
+
+.opts{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.opt{text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:11px;
+  padding:14px 16px;font-size:15px;font-weight:500;color:var(--ink);transition:.13s}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.sel{border-color:var(--bleu);background:#eef2f8}
+.opt.correct{border-color:var(--vert);background:#e7efe8}
+.opt.bad{border-color:var(--rouge);background:#f8e9e6}
+
+.build-line{min-height:54px;display:flex;flex-wrap:wrap;gap:8px;padding:12px;border:1.5px dashed var(--line);
+  border-radius:12px;margin-bottom:12px;align-items:center}
+.build-ph{color:var(--soft);font-size:14px;font-style:italic}
+.build-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.tile{background:var(--paper);border:1.5px solid var(--line);border-radius:9px;padding:9px 14px;font-size:15px;font-weight:600;transition:.12s}
+.tile:hover:not(:disabled){border-color:var(--ink);transform:translateY(-1px)}
+.tile.placed{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+.field{width:100%;padding:15px 18px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);
+  font-family:inherit;font-size:17px;outline:none;margin-bottom:18px;transition:border-color .2s}
+.field:focus{border-color:var(--bleu)}
+.field.right{border-color:var(--vert);background:#e7efe8}
+.field.wrong{border-color:var(--rouge);background:#f8e9e6}
+
+.verdict{padding:14px 16px;border-radius:11px;font-size:15px}
+.verdict span{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.verdict.right{background:#e7efe8;color:var(--vert)}
+.verdict.wrong{background:#f8e9e6;color:var(--rouge)}
+.verdict strong{font-family:'Fraunces',serif}
+
+.result{text-align:center;padding:20px 0}
+.score-ring{--p:0;width:120px;height:120px;border-radius:50%;margin:0 auto 18px;display:grid;place-items:center;
+  background:conic-gradient(var(--vert) calc(var(--p)*1%),var(--line) 0);position:relative}
+.score-ring::before{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--paper)}
+.score-ring span{position:relative;font-family:'Fraunces',serif;font-size:30px}
+.result h2{font-size:28px;margin-bottom:8px}
+.result p{color:var(--soft);max-width:380px;margin:0 auto 22px}
+.result-btns{display:flex;gap:12px;justify-content:center}
+.big-score{font-family:'Fraunces',serif;font-size:64px;color:var(--rouge);margin:10px 0}
+.big-score span{font-size:22px;color:var(--soft)}
+
+.ch-hud{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.hearts{color:var(--rouge);font-size:20px;letter-spacing:2px}
+.hearts .dim{color:var(--line)}
+.ch-score{font-weight:700}
+.ch-tag{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-weight:700;margin-bottom:18px}
+
+.daily-wrap{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:34px 28px;text-align:center;box-shadow:var(--shadow)}
+.daily-kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--or);font-weight:700}
+.daily-fr{font-size:30px;line-height:1.25;margin:14px 0 18px;font-style:italic}
+.daily-actions{display:flex;align-items:center;gap:14px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}
+.daily-en{color:var(--soft);font-size:16px}
+
+.bottom{text-align:center;color:var(--soft);font-size:13px;padding:24px;position:relative;z-index:1}
+
+@keyframes rise{to{opacity:1;transform:translateY(0)}}
+.unit-card{transform:translateY(12px)}
+
+@media(max-width:600px){
+  .top{padding:12px 16px}.main,main{padding:22px 16px 40px}
+  .hero h1{font-size:30px}.units{grid-template-columns:1fr}
+  .lvl-head{padding:16px}.ex{padding:18px}.ex-q{font-size:19px}
+}
+`;
+
+const container=document.getElementById("root");
+ReactDOM.createRoot(container).render(<App />);
+</script>
+</body>
+</html>
