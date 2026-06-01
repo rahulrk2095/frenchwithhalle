@@ -804,6 +804,76 @@ const READING = [
       { q: "Que recommande le texte ?", a: "Les utiliser avec modération", opts: ["Les interdire", "Les utiliser avec modération", "En acheter plus"] },
     ],
   },
+  {
+    id: "rd-a1-famille", level: "A1", title: "Ma famille", mins: 2, premium: false,
+    text: "Je m'appelle Lucas. J'ai une grande famille. Mon père s'appelle Pierre et ma mère s'appelle Claire. J'ai deux frères et une sœur. Mon frère aîné a vingt ans. Il habite à Paris. Ma sœur a douze ans. Elle aime la musique. Nous habitons dans une petite maison à Lyon.",
+    en: "My name is Lucas. I have a big family. My father is called Pierre and my mother is called Claire. I have two brothers and one sister. My oldest brother is twenty years old. He lives in Paris. My sister is twelve years old. She likes music. We live in a small house in Lyon.",
+    questions: [
+      { q: "Comment s'appelle la mère de Lucas ?", a: "Claire", opts: ["Marie", "Claire", "Sophie"] },
+      { q: "Où habite le frère aîné ?", a: "À Paris", opts: ["À Lyon", "À Paris", "À Nice"] },
+      { q: "Qu'est-ce que la sœur aime ?", a: "La musique", opts: ["Le sport", "La musique", "Les livres"] },
+    ],
+  },
+  {
+    id: "rd-a2-metro", level: "A2", title: "Prendre le métro", mins: 3, premium: false,
+    text: "À Paris, le métro est le moyen de transport le plus utilisé. Il y a seize lignes et plus de trois cents stations. Pour prendre le métro, on achète un ticket ou un carnet de dix tickets. Il faut valider le ticket avant de passer les tourniquets. Le métro fonctionne de cinq heures trente jusqu'à minuit et demi. Pendant les heures de pointe, les rames sont souvent bondées.",
+    en: "In Paris, the metro is the most used means of transport. There are sixteen lines and more than three hundred stations. To take the metro, you buy a ticket or a book of ten tickets. You must validate the ticket before passing through the turnstiles. The metro runs from five-thirty until half past midnight. During rush hours, the carriages are often packed.",
+    questions: [
+      { q: "Combien de lignes y a-t-il ?", a: "Seize", opts: ["Douze", "Seize", "Vingt"] },
+      { q: "Quand est-ce que le métro s'arrête ?", a: "À minuit et demi", opts: ["À minuit", "À minuit et demi", "À une heure"] },
+      { q: "Que faut-il faire avant les tourniquets ?", a: "Valider le ticket", opts: ["Acheter un carnet", "Valider le ticket", "Montrer sa carte"] },
+    ],
+  },
+  {
+    id: "rd-b1-cuisine", level: "B1", title: "La cuisine française", mins: 4, premium: true,
+    text: "La gastronomie française est reconnue dans le monde entier. En 2010, elle a même été inscrite au patrimoine culturel immatériel de l'UNESCO. Les repas français se distinguent par leur structure : on commence généralement par une entrée, puis un plat principal, suivi d'un fromage et d'un dessert. Le repas est avant tout un moment social. Les Français accordent beaucoup d'importance au fait de manger ensemble, de prendre le temps de savourer chaque plat et d'apprécier le vin qui l'accompagne.",
+    en: "French gastronomy is recognized worldwide. In 2010, it was even added to UNESCO's Intangible Cultural Heritage. French meals are distinguished by their structure: you generally start with a starter, then a main course, followed by cheese and dessert. The meal is above all a social moment. The French attach great importance to eating together, taking time to savour each dish and appreciate the wine that accompanies it.",
+    questions: [
+      { q: "Quand la gastronomie française a-t-elle été reconnue par l'UNESCO ?", a: "En 2010", opts: ["En 2000", "En 2010", "En 2015"] },
+      { q: "Quel est l'ordre d'un repas français typique ?", a: "Entrée, plat, fromage, dessert", opts: ["Soupe, plat, dessert", "Entrée, plat, fromage, dessert", "Plat, fromage, café"] },
+      { q: "Quelle importance les Français donnent-ils au repas ?", a: "Un moment social", opts: ["Un moment rapide", "Un moment social", "Un moment silencieux"] },
+    ],
+  },
+  {
+    id: "rd-b1-ecologie", level: "B1", title: "L'écologie au quotidien", mins: 4, premium: true,
+    text: "De plus en plus de Français cherchent à adopter un mode de vie plus écologique. Certains choisissent de réduire leur consommation de viande, d'autres préfèrent se déplacer à vélo plutôt qu'en voiture. Le tri des déchets est désormais obligatoire dans de nombreuses villes. Les jeunes générations semblent particulièrement sensibles à ces questions environnementales. Malgré ces efforts, les experts soulignent que des changements structurels restent indispensables pour vraiment réduire l'empreinte carbone.",
+    en: "More and more French people are trying to adopt a more ecological lifestyle. Some choose to reduce their meat consumption, others prefer to travel by bike rather than by car. Waste sorting is now compulsory in many cities. Younger generations seem particularly sensitive to environmental issues. Despite these efforts, experts point out that structural changes remain essential to truly reduce the carbon footprint.",
+    questions: [
+      { q: "Quel changement est désormais obligatoire dans de nombreuses villes ?", a: "Le tri des déchets", opts: ["Le vélo", "Le tri des déchets", "Le régime végétarien"] },
+      { q: "Qui semble le plus sensible aux questions environnementales ?", a: "Les jeunes générations", opts: ["Les retraités", "Les jeunes générations", "Les entreprises"] },
+      { q: "Que soulignent les experts ?", a: "Des changements structurels sont indispensables", opts: ["Tout va bien", "Des changements structurels sont indispensables", "Les efforts individuels suffisent"] },
+    ],
+  },
+  {
+    id: "rd-b2-immigration", level: "B2", title: "L'identité culturelle", mins: 5, premium: true,
+    text: "La France est depuis longtemps une terre d'accueil, façonnée par des vagues successives d'immigration. Cette diversité culturelle constitue à la fois une richesse et un défi. D'un côté, elle enrichit la société par ses apports culinaires, artistiques et intellectuels. De l'autre, elle soulève des questions complexes sur l'intégration et le « vivre ensemble ». Le modèle républicain français, fondé sur l'universalisme et la laïcité, peine parfois à concilier l'unité nationale et la reconnaissance des particularités culturelles.",
+    en: "France has long been a land of welcome, shaped by successive waves of immigration. This cultural diversity is both an asset and a challenge. On one side, it enriches society through its culinary, artistic and intellectual contributions. On the other, it raises complex questions about integration and 'living together'. The French republican model, based on universalism and secularism, sometimes struggles to reconcile national unity with the recognition of cultural particularities.",
+    questions: [
+      { q: "Sur quoi est fondé le modèle républicain français ?", a: "L'universalisme et la laïcité", opts: ["La monarchie", "L'universalisme et la laïcité", "Le fédéralisme"] },
+      { q: "Comment la diversité culturelle est-elle décrite ?", a: "Une richesse et un défi", opts: ["Un problème majeur", "Une richesse et un défi", "Une solution simple"] },
+      { q: "Que peine à faire le modèle républicain ?", a: "Concilier unité et particularités", opts: ["Accepter l'immigration", "Concilier unité et particularités", "Financer les écoles"] },
+    ],
+  },
+  {
+    id: "rd-c1-philosophie", level: "C1", title: "La liberté selon Sartre", mins: 6, premium: true,
+    text: "Pour Jean-Paul Sartre, l'existence précède l'essence : l'être humain n'a pas de nature prédéfinie et se crée entièrement par ses choix. Cette liberté radicale est source d'une « angoisse » existentielle, car nous ne pouvons fuir notre responsabilité. Sartre affirme que nous sommes « condamnés à être libres » — même refuser de choisir est un choix. Cette philosophie, développée dans L'Être et le Néant, a profondément marqué la pensée française du XXe siècle et continue d'influencer la réflexion contemporaine sur l'identité, la responsabilité et le sens de la vie.",
+    en: "For Jean-Paul Sartre, existence precedes essence: the human being has no predefined nature and creates themselves entirely through their choices. This radical freedom is the source of an existential 'anguish', since we cannot escape our responsibility. Sartre states that we are 'condemned to be free' — even refusing to choose is a choice. This philosophy, developed in Being and Nothingness, profoundly marked French thought in the 20th century and continues to influence contemporary reflection on identity, responsibility and the meaning of life.",
+    questions: [
+      { q: "Que signifie « l'existence précède l'essence » ?", a: "L'humain se définit par ses choix", opts: ["La nature détermine le destin", "L'humain se définit par ses choix", "Dieu crée l'essence"] },
+      { q: "Pourquoi Sartre parle-t-il d'« angoisse » ?", a: "On ne peut fuir sa responsabilité", opts: ["La vie est trop courte", "On ne peut fuir sa responsabilité", "La liberté est illusoire"] },
+      { q: "Dans quel ouvrage Sartre développe-t-il ces idées ?", a: "L'Être et le Néant", opts: ["La Nausée", "L'Être et le Néant", "Les Mains sales"] },
+    ],
+  },
+  {
+    id: "rd-a2-animaux", level: "A2", title: "Les animaux de compagnie", mins: 3, premium: false,
+    text: "En France, les animaux de compagnie sont très populaires. Il y a environ soixante-trois millions d'animaux domestiques dans le pays. Les chiens et les chats sont les plus répandus. Beaucoup de Français considèrent leur animal comme un membre de la famille. Il est même possible d'emmener son chien dans certains restaurants et hôtels. Cependant, posséder un animal demande beaucoup de responsabilités : il faut le nourrir, le soigner et passer du temps avec lui.",
+    en: "In France, pets are very popular. There are around sixty-three million domestic animals in the country. Dogs and cats are the most common. Many French people consider their pet a member of the family. It is even possible to bring your dog to some restaurants and hotels. However, owning a pet requires a lot of responsibility: you must feed it, care for it and spend time with it.",
+    questions: [
+      { q: "Combien d'animaux domestiques y a-t-il en France ?", a: "Environ 63 millions", opts: ["Environ 10 millions", "Environ 63 millions", "Environ 100 millions"] },
+      { q: "Comment beaucoup de Français voient-ils leur animal ?", a: "Comme un membre de la famille", opts: ["Comme un jouet", "Comme un membre de la famille", "Comme un problème"] },
+      { q: "Qu'est-ce que posséder un animal demande ?", a: "Beaucoup de responsabilités", opts: ["Peu d'argent", "Beaucoup de responsabilités", "Un grand jardin"] },
+    ],
+  },
 ];
 
 // ============================================================
@@ -857,12 +927,329 @@ const DIALOGUES = [
       { fr: "De quel quai… ?", en: "From which platform…?" },
     ],
   },
+  {
+    id: "dg-b1-docteur", level: "B1", title: "Chez le médecin", setting: "Describing symptoms at the doctor", premium: true,
+    lines: [
+      { who: "Médecin", fr: "Bonjour, qu'est-ce qui ne va pas ?", en: "Hello, what seems to be the problem?" },
+      { who: "Patient", fr: "J'ai mal à la gorge depuis trois jours et j'ai de la fièvre.", en: "I've had a sore throat for three days and I have a fever." },
+      { who: "Médecin", fr: "Vous avez de la toux aussi ?", en: "Do you have a cough too?" },
+      { who: "Patient", fr: "Oui, surtout la nuit. Je dors très mal.", en: "Yes, especially at night. I sleep very badly." },
+      { who: "Médecin", fr: "Je vais vous examiner. Ouvrez la bouche, s'il vous plaît.", en: "I'm going to examine you. Open your mouth, please." },
+      { who: "Médecin", fr: "C'est une angine. Je vous prescris des antibiotiques.", en: "It's a throat infection. I'm prescribing you antibiotics." },
+      { who: "Patient", fr: "Combien de jours dois-je les prendre ?", en: "How many days do I need to take them?" },
+    ],
+    phrases: [
+      { fr: "J'ai mal à…", en: "I have a pain in… / My … hurts" },
+      { fr: "depuis trois jours", en: "for three days" },
+      { fr: "Je vous prescris…", en: "I'm prescribing you…" },
+    ],
+  },
+  {
+    id: "dg-a1-shopping", level: "A1", title: "Au magasin", setting: "Buying clothes in a shop", premium: false,
+    lines: [
+      { who: "Vendeur", fr: "Bonjour, je peux vous aider ?", en: "Hello, can I help you?" },
+      { who: "Cliente", fr: "Oui, je cherche une robe bleue.", en: "Yes, I'm looking for a blue dress." },
+      { who: "Vendeur", fr: "Quelle taille faites-vous ?", en: "What size are you?" },
+      { who: "Cliente", fr: "Je fais du trente-huit.", en: "I'm a size thirty-eight." },
+      { who: "Vendeur", fr: "Voilà, essayez celle-ci.", en: "Here you go, try this one." },
+      { who: "Cliente", fr: "Elle est belle, mais c'est combien ?", en: "It's beautiful, but how much is it?" },
+      { who: "Vendeur", fr: "Cinquante euros.", en: "Fifty euros." },
+    ],
+    phrases: [
+      { fr: "Je cherche…", en: "I'm looking for…" },
+      { fr: "Quelle taille ?", en: "What size?" },
+      { fr: "Je fais du…", en: "I'm a size…" },
+    ],
+  },
+  {
+    id: "dg-b1-travail", level: "B1", title: "Un entretien d'embauche", setting: "Job interview in French", premium: true,
+    lines: [
+      { who: "RH", fr: "Bonjour, asseyez-vous. Parlez-moi de vous.", en: "Hello, sit down. Tell me about yourself." },
+      { who: "Candidat", fr: "J'ai cinq ans d'expérience dans le marketing digital. J'ai géré des campagnes pour des entreprises internationales.", en: "I have five years of experience in digital marketing. I managed campaigns for international companies." },
+      { who: "RH", fr: "Pourquoi voulez-vous rejoindre notre entreprise ?", en: "Why do you want to join our company?" },
+      { who: "Candidat", fr: "Votre entreprise est reconnue pour son innovation. Je voudrais contribuer à votre croissance.", en: "Your company is recognized for its innovation. I would like to contribute to your growth." },
+      { who: "RH", fr: "Quelles sont vos prétentions salariales ?", en: "What are your salary expectations?" },
+      { who: "Candidat", fr: "Je souhaiterais un salaire autour de quarante-cinq mille euros par an.", en: "I would like a salary of around forty-five thousand euros a year." },
+    ],
+    phrases: [
+      { fr: "Parlez-moi de vous.", en: "Tell me about yourself." },
+      { fr: "Prétentions salariales", en: "Salary expectations" },
+      { fr: "Je souhaiterais…", en: "I would like… (formal)" },
+    ],
+  },
+  {
+    id: "dg-a2-telephone", level: "A2", title: "Au téléphone", setting: "Making a phone call to a business", premium: false,
+    lines: [
+      { who: "Secrétaire", fr: "Allô, cabinet médical Dupont, bonjour.", en: "Hello, Dupont medical practice, good morning." },
+      { who: "Patient", fr: "Bonjour, je voudrais prendre rendez-vous avec le docteur Dupont.", en: "Hello, I'd like to make an appointment with Doctor Dupont." },
+      { who: "Secrétaire", fr: "Bien sûr. C'est pour quel motif ?", en: "Of course. What is the reason?" },
+      { who: "Patient", fr: "J'ai de la fièvre depuis hier.", en: "I've had a fever since yesterday." },
+      { who: "Secrétaire", fr: "Je vous propose demain à dix heures. C'est possible pour vous ?", en: "I can offer you tomorrow at ten o'clock. Is that possible for you?" },
+      { who: "Patient", fr: "Oui, c'est parfait. Merci beaucoup.", en: "Yes, that's perfect. Thank you very much." },
+    ],
+    phrases: [
+      { fr: "Prendre rendez-vous", en: "To make an appointment" },
+      { fr: "C'est pour quel motif ?", en: "What is the reason?" },
+      { fr: "Je vous propose…", en: "I can offer you…" },
+    ],
+  },
+  {
+    id: "dg-b2-logement", level: "B2", title: "Chercher un appartement", setting: "Renting a flat in France", premium: true,
+    lines: [
+      { who: "Agence", fr: "Bonjour, vous êtes intéressé par l'appartement de la rue Victor Hugo ?", en: "Hello, are you interested in the flat on Victor Hugo Street?" },
+      { who: "Locataire", fr: "Oui, est-ce que les charges sont incluses dans le loyer ?", en: "Yes, are the utilities included in the rent?" },
+      { who: "Agence", fr: "Les charges sont de cinquante euros par mois en plus du loyer.", en: "The utilities are fifty euros per month on top of the rent." },
+      { who: "Locataire", fr: "Et il faut combien de mois de caution ?", en: "And how many months' deposit is required?" },
+      { who: "Agence", fr: "Un mois de caution. Il faut aussi fournir vos trois dernières fiches de paie.", en: "One month's deposit. You also need to provide your last three pay slips." },
+      { who: "Locataire", fr: "D'accord. Je peux visiter l'appartement ce week-end ?", en: "OK. Can I visit the flat this weekend?" },
+    ],
+    phrases: [
+      { fr: "Les charges sont incluses ?", en: "Are utilities included?" },
+      { fr: "Mois de caution", en: "Months of deposit" },
+      { fr: "Fiches de paie", en: "Pay slips" },
+    ],
+  },
 ];
 
 
 // Live settings mirror — the App keeps this in sync with the current user's
 // settings so module-level helpers (norm, speak) can read them.
 const LIVE = { audioSpeed: "normal", strictAccents: false, autoAdvance: false, voiceURI: null, pitch: 1 };
+
+// ============================================================
+//  CONJUGATION DATA  (verb + tense + all 6 forms)
+// ============================================================
+const CONJUGATIONS = [
+  { verb: "être", meaning: "to be", tense: "Présent",
+    forms: { je: "suis", tu: "es", il: "est", nous: "sommes", vous: "êtes", ils: "sont" } },
+  { verb: "avoir", meaning: "to have", tense: "Présent",
+    forms: { je: "ai", tu: "as", il: "a", nous: "avons", vous: "avez", ils: "ont" } },
+  { verb: "aller", meaning: "to go", tense: "Présent",
+    forms: { je: "vais", tu: "vas", il: "va", nous: "allons", vous: "allez", ils: "vont" } },
+  { verb: "faire", meaning: "to do/make", tense: "Présent",
+    forms: { je: "fais", tu: "fais", il: "fait", nous: "faisons", vous: "faites", ils: "font" } },
+  { verb: "pouvoir", meaning: "to be able to", tense: "Présent",
+    forms: { je: "peux", tu: "peux", il: "peut", nous: "pouvons", vous: "pouvez", ils: "peuvent" } },
+  { verb: "vouloir", meaning: "to want", tense: "Présent",
+    forms: { je: "veux", tu: "veux", il: "veut", nous: "voulons", vous: "voulez", ils: "veulent" } },
+  { verb: "devoir", meaning: "to have to / must", tense: "Présent",
+    forms: { je: "dois", tu: "dois", il: "doit", nous: "devons", vous: "devez", ils: "doivent" } },
+  { verb: "savoir", meaning: "to know", tense: "Présent",
+    forms: { je: "sais", tu: "sais", il: "sait", nous: "savons", vous: "savez", ils: "savent" } },
+  { verb: "venir", meaning: "to come", tense: "Présent",
+    forms: { je: "viens", tu: "viens", il: "vient", nous: "venons", vous: "venez", ils: "viennent" } },
+  { verb: "prendre", meaning: "to take", tense: "Présent",
+    forms: { je: "prends", tu: "prends", il: "prend", nous: "prenons", vous: "prenez", ils: "prennent" } },
+  { verb: "dire", meaning: "to say", tense: "Présent",
+    forms: { je: "dis", tu: "dis", il: "dit", nous: "disons", vous: "dites", ils: "disent" } },
+  { verb: "voir", meaning: "to see", tense: "Présent",
+    forms: { je: "vois", tu: "vois", il: "voit", nous: "voyons", vous: "voyez", ils: "voient" } },
+  { verb: "être", meaning: "to be", tense: "Imparfait",
+    forms: { je: "étais", tu: "étais", il: "était", nous: "étions", vous: "étiez", ils: "étaient" } },
+  { verb: "avoir", meaning: "to have", tense: "Imparfait",
+    forms: { je: "avais", tu: "avais", il: "avait", nous: "avions", vous: "aviez", ils: "avaient" } },
+  { verb: "aller", meaning: "to go", tense: "Futur",
+    forms: { je: "irai", tu: "iras", il: "ira", nous: "irons", vous: "irez", ils: "iront" } },
+  { verb: "être", meaning: "to be", tense: "Futur",
+    forms: { je: "serai", tu: "seras", il: "sera", nous: "serons", vous: "serez", ils: "seront" } },
+  { verb: "avoir", meaning: "to have", tense: "Futur",
+    forms: { je: "aurai", tu: "auras", il: "aura", nous: "aurons", vous: "aurez", ils: "auront" } },
+  { verb: "faire", meaning: "to do/make", tense: "Futur",
+    forms: { je: "ferai", tu: "feras", il: "fera", nous: "ferons", vous: "ferez", ils: "feront" } },
+  { verb: "pouvoir", meaning: "to be able to", tense: "Conditionnel",
+    forms: { je: "pourrais", tu: "pourrais", il: "pourrait", nous: "pourrions", vous: "pourriez", ils: "pourraient" } },
+  { verb: "être", meaning: "to be", tense: "Subjonctif",
+    forms: { je: "sois", tu: "sois", il: "soit", nous: "soyons", vous: "soyez", ils: "soient" } },
+  { verb: "avoir", meaning: "to have", tense: "Subjonctif",
+    forms: { je: "aie", tu: "aies", il: "ait", nous: "ayons", vous: "ayez", ils: "aient" } },
+  { verb: "faire", meaning: "to do/make", tense: "Subjonctif",
+    forms: { je: "fasse", tu: "fasses", il: "fasse", nous: "fassions", vous: "fassiez", ils: "fassent" } },
+  { verb: "parler", meaning: "to speak", tense: "Présent",
+    forms: { je: "parle", tu: "parles", il: "parle", nous: "parlons", vous: "parlez", ils: "parlent" } },
+  { verb: "finir", meaning: "to finish", tense: "Présent",
+    forms: { je: "finis", tu: "finis", il: "finit", nous: "finissons", vous: "finissez", ils: "finissent" } },
+  { verb: "partir", meaning: "to leave", tense: "Présent",
+    forms: { je: "pars", tu: "pars", il: "part", nous: "partons", vous: "partez", ils: "partent" } },
+];
+
+// ============================================================
+//  PHRASEBOOK  (300 practical phrases, 12 situations)
+//  Premium for most categories — survival French is free
+// ============================================================
+const PHRASEBOOK = [
+  {
+    cat: "Survival French", icon: "🆘", premium: false,
+    phrases: [
+      { fr: "Au secours !", en: "Help!" },
+      { fr: "Appelez la police !", en: "Call the police!" },
+      { fr: "Appelez une ambulance !", en: "Call an ambulance!" },
+      { fr: "Je suis perdu(e).", en: "I am lost." },
+      { fr: "Je ne comprends pas.", en: "I don't understand." },
+      { fr: "Parlez-vous anglais ?", en: "Do you speak English?" },
+      { fr: "Répétez, s'il vous plaît.", en: "Please repeat." },
+      { fr: "Parlez plus lentement.", en: "Speak more slowly." },
+      { fr: "Où sont les toilettes ?", en: "Where are the toilets?" },
+      { fr: "C'est une urgence.", en: "It's an emergency." },
+    ],
+  },
+  {
+    cat: "Greetings & Politeness", icon: "👋", premium: false,
+    phrases: [
+      { fr: "Bonjour !", en: "Hello! / Good morning!" },
+      { fr: "Bonsoir !", en: "Good evening!" },
+      { fr: "Bonne nuit !", en: "Good night!" },
+      { fr: "Au revoir !", en: "Goodbye!" },
+      { fr: "À bientôt !", en: "See you soon!" },
+      { fr: "Comment allez-vous ?", en: "How are you? (formal)" },
+      { fr: "Ça va ?", en: "How are you? (casual)" },
+      { fr: "Très bien, merci.", en: "Very well, thank you." },
+      { fr: "Enchanté(e) !", en: "Nice to meet you!" },
+      { fr: "S'il vous plaît.", en: "Please. (formal)" },
+      { fr: "Merci beaucoup.", en: "Thank you very much." },
+      { fr: "De rien.", en: "You're welcome." },
+      { fr: "Excusez-moi.", en: "Excuse me. (formal)" },
+      { fr: "Je suis désolé(e).", en: "I'm sorry." },
+    ],
+  },
+  {
+    cat: "Eating & Drinking", icon: "🍽️", premium: false,
+    phrases: [
+      { fr: "Une table pour deux, s'il vous plaît.", en: "A table for two, please." },
+      { fr: "La carte, s'il vous plaît.", en: "The menu, please." },
+      { fr: "Je voudrais commander.", en: "I'd like to order." },
+      { fr: "C'est quoi, le plat du jour ?", en: "What is today's special?" },
+      { fr: "Je suis végétarien(ne).", en: "I am vegetarian." },
+      { fr: "J'ai une allergie au…", en: "I have an allergy to…" },
+      { fr: "C'est délicieux !", en: "It's delicious!" },
+      { fr: "L'addition, s'il vous plaît.", en: "The bill, please." },
+      { fr: "Est-ce que le service est compris ?", en: "Is the service charge included?" },
+      { fr: "Une carafe d'eau, s'il vous plaît.", en: "A jug of water, please." },
+    ],
+  },
+  {
+    cat: "Getting Around", icon: "🗺️", premium: true,
+    phrases: [
+      { fr: "Où est… ?", en: "Where is…?" },
+      { fr: "Comment aller à… ?", en: "How do I get to…?" },
+      { fr: "Tournez à gauche.", en: "Turn left." },
+      { fr: "Tournez à droite.", en: "Turn right." },
+      { fr: "Tout droit.", en: "Straight ahead." },
+      { fr: "C'est loin ?", en: "Is it far?" },
+      { fr: "Un billet pour…, s'il vous plaît.", en: "A ticket to…, please." },
+      { fr: "À quelle heure part le prochain train ?", en: "What time does the next train leave?" },
+      { fr: "Est-ce que ce bus va à… ?", en: "Does this bus go to…?" },
+      { fr: "Je voudrais louer une voiture.", en: "I'd like to rent a car." },
+    ],
+  },
+  {
+    cat: "Shopping", icon: "🛍️", premium: true,
+    phrases: [
+      { fr: "Combien ça coûte ?", en: "How much does it cost?" },
+      { fr: "C'est trop cher.", en: "It's too expensive." },
+      { fr: "Avez-vous quelque chose de moins cher ?", en: "Do you have something cheaper?" },
+      { fr: "Je fais du…", en: "I'm a size…" },
+      { fr: "Est-ce que je peux l'essayer ?", en: "Can I try it on?" },
+      { fr: "Je vais le/la prendre.", en: "I'll take it." },
+      { fr: "Vous acceptez les cartes ?", en: "Do you accept cards?" },
+      { fr: "Avez-vous un sac ?", en: "Do you have a bag?" },
+      { fr: "Je cherche…", en: "I'm looking for…" },
+      { fr: "C'est pour offrir.", en: "It's a gift." },
+    ],
+  },
+  {
+    cat: "At the Hotel", icon: "🏨", premium: true,
+    phrases: [
+      { fr: "J'ai une réservation au nom de…", en: "I have a reservation under the name…" },
+      { fr: "À quelle heure est le check-in ?", en: "What time is check-in?" },
+      { fr: "La chambre n'est pas propre.", en: "The room isn't clean." },
+      { fr: "Il n'y a pas d'eau chaude.", en: "There's no hot water." },
+      { fr: "Pouvez-vous m'appeler un taxi ?", en: "Can you call me a taxi?" },
+      { fr: "Où est le petit-déjeuner ?", en: "Where is breakfast?" },
+      { fr: "À quelle heure est le check-out ?", en: "What time is check-out?" },
+      { fr: "Puis-je laisser mes bagages ?", en: "Can I leave my luggage?" },
+      { fr: "Le wifi est-il gratuit ?", en: "Is the wifi free?" },
+      { fr: "Je voudrais prolonger mon séjour.", en: "I'd like to extend my stay." },
+    ],
+  },
+  {
+    cat: "Health & Emergencies", icon: "🏥", premium: true,
+    phrases: [
+      { fr: "J'ai besoin d'un médecin.", en: "I need a doctor." },
+      { fr: "J'ai mal à la tête.", en: "I have a headache." },
+      { fr: "J'ai de la fièvre.", en: "I have a fever." },
+      { fr: "Je me suis blessé(e).", en: "I've hurt myself." },
+      { fr: "Où est la pharmacie la plus proche ?", en: "Where is the nearest pharmacy?" },
+      { fr: "J'ai besoin de ce médicament.", en: "I need this medication." },
+      { fr: "Je suis allergique à…", en: "I am allergic to…" },
+      { fr: "Appelez le SAMU.", en: "Call the emergency services. (France)" },
+      { fr: "J'ai perdu mes papiers.", en: "I've lost my documents." },
+      { fr: "On m'a volé mon sac.", en: "My bag has been stolen." },
+    ],
+  },
+  {
+    cat: "Work & Business", icon: "💼", premium: true,
+    phrases: [
+      { fr: "Je suis ici pour une conférence.", en: "I'm here for a conference." },
+      { fr: "Avez-vous ma carte de visite ?", en: "Do you have my business card?" },
+      { fr: "Je travaille dans…", en: "I work in…" },
+      { fr: "Pouvons-nous fixer un rendez-vous ?", en: "Can we schedule a meeting?" },
+      { fr: "Je vous envoie le document par email.", en: "I'll send you the document by email." },
+      { fr: "Quel est votre délai ?", en: "What is your deadline?" },
+      { fr: "Je suis disponible à partir de…", en: "I'm available from…" },
+      { fr: "On se tutoie ?", en: "Shall we use first names? (informal)" },
+      { fr: "Le contrat est en cours de révision.", en: "The contract is under review." },
+      { fr: "Nous sommes en accord sur ce point.", en: "We agree on this point." },
+    ],
+  },
+  {
+    cat: "Small Talk", icon: "💬", premium: true,
+    phrases: [
+      { fr: "Vous venez d'où ?", en: "Where are you from?" },
+      { fr: "Qu'est-ce que vous faites dans la vie ?", en: "What do you do for a living?" },
+      { fr: "Vous habitez ici depuis longtemps ?", en: "Have you lived here long?" },
+      { fr: "Quel temps ! Hein ?", en: "What weather, right?" },
+      { fr: "Qu'est-ce que vous aimez faire ?", en: "What do you like to do?" },
+      { fr: "Je suis en vacances.", en: "I'm on holiday." },
+      { fr: "C'est ma première fois en France.", en: "It's my first time in France." },
+      { fr: "J'apprends le français depuis…", en: "I've been learning French for…" },
+      { fr: "Votre français est excellent !", en: "Your French is excellent!" },
+      { fr: "Je fais des progrès !", en: "I'm making progress!" },
+    ],
+  },
+  {
+    cat: "Love & Relationships", icon: "💕", premium: true,
+    phrases: [
+      { fr: "Tu es très beau / belle.", en: "You are very handsome / beautiful." },
+      { fr: "Je t'aime.", en: "I love you." },
+      { fr: "Tu me manques.", en: "I miss you." },
+      { fr: "On peut se revoir ?", en: "Can we meet again?" },
+      { fr: "Est-ce que tu veux sortir avec moi ?", en: "Do you want to go out with me?" },
+      { fr: "Je pense à toi.", en: "I'm thinking of you." },
+      { fr: "Tu m'as manqué(e).", en: "I missed you." },
+      { fr: "Je suis amoureux / amoureuse de toi.", en: "I'm in love with you." },
+      { fr: "C'est compliqué.", en: "It's complicated." },
+      { fr: "Restons amis.", en: "Let's stay friends." },
+    ],
+  },
+];
+
+// ============================================================
+//  CULTURAL NOTES  (real French life — free for all)
+// ============================================================
+const CULTURAL_NOTES = [
+  { id: "cn-1", emoji: "🤝", title: "La bise", body: "In France, friends and family greet each other with a kiss on the cheek (la bise). The number varies by region — it's usually 2, but can be 1, 3 or even 4. With strangers in a professional context, a handshake is standard. Never be offended if someone goes for la bise — it's warm, not intrusive." },
+  { id: "cn-2", emoji: "🍽️", title: "Le repas français", body: "A French meal has a structure: apéritif (drinks + nibbles), entrée (starter), plat principal (main), fromage (cheese board), dessert, café. Eating quickly is considered rude. Lunch can last 2 hours. Dinner with family or friends is a sacred ritual — no rushing." },
+  { id: "cn-3", emoji: "🥖", title: "La baguette", body: "The baguette is more than bread — it's a daily ritual. Most French people buy a fresh one every day (or twice a day). It's protected by law: a traditional baguette must be made on site and contain only flour, water, salt and yeast. In 2022, la baguette tradition was added to UNESCO's intangible cultural heritage list." },
+  { id: "cn-4", emoji: "🗣️", title: "Tu vs Vous", body: "Tu (informal) is for friends, family, children, and peers your own age. Vous (formal) is for strangers, older people, authority figures, and professional contexts. Using tu too early can offend; a French person will usually signal when it's OK to switch. When in doubt, always start with vous." },
+  { id: "cn-5", emoji: "🏖️", title: "August in France", body: "Most of France goes on holiday in August. Businesses close, Paris empties, and coastal towns fill up. If you need something done in August — a delivery, an administrative task, a business call — prepare to wait until September. This is not rudeness; it is sacred tradition." },
+  { id: "cn-6", emoji: "💊", title: "La pharmacie", body: "French pharmacies (identified by a green cross) are walk-in mini-clinics. Pharmacists are highly trained and can advise on many health issues, recommend over-the-counter remedies, and even give basic treatment for minor wounds. Don't go straight to the doctor for a cold — try the pharmacie first." },
+  { id: "cn-7", emoji: "📜", title: "La laïcité", body: "France is strictly secular (laïque). Religion is considered a private matter, and the state is completely separate from it. Religious symbols are prohibited in public schools and for civil servants on duty. This principle is deeply held and often misunderstood by foreigners — it's not anti-religion, it's about keeping public life neutral." },
+  { id: "cn-8", emoji: "🍷", title: "Wine culture", body: "Wine in France is not alcohol — it is culture. Each region produces different wines: Bordeaux (Merlot, Cabernet), Burgundy (Pinot Noir, Chardonnay), Champagne (bubbles only), Loire (Sauvignon Blanc, rosé). Ordering the house wine (le vin de la maison) at a restaurant is perfectly fine and often excellent." },
+  { id: "cn-9", emoji: "🎭", title: "French humour", body: "French humour tends to be dry, ironic, and self-deprecating. Teasing (taquiner) is a sign of affection. Don't expect the broad slapstick or warmth of Anglo humour — a French person being deadpan is often being funny. If they're joking about something serious, that's a compliment — it means they trust you." },
+  { id: "cn-10", emoji: "📮", title: "Administrative life", body: "France is famously bureaucratic (la paperasse — literally 'paper-asse'). To do almost anything official, you'll need documents: your identity card (carte d'identité), a proof of address (justificatif de domicile), and often a recent pay slip. Keep clean copies of everything. 'Bring the original and a photocopy' is a mantra." },
+];
+
+
 
 // Loose check: ignore accents/punctuation/case. Used when strictAccents is off.
 const normLoose = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9' ]/g, "").replace(/\s+/g, " ").trim();
@@ -1719,6 +2106,249 @@ function DialogueLibrary({ onExit }) {
   );
 }
 
+// ---------- CONJUGATION TRAINER ----------
+const SUBJECTS = ["je", "tu", "il/elle", "nous", "vous", "ils/elles"];
+const FORM_KEYS = ["je", "tu", "il", "nous", "vous", "ils"];
+
+function ConjugationTrainer({ onExit, awardXP, onAnswered }) {
+  const tenses = [...new Set(CONJUGATIONS.map(c => c.tense))];
+  const [tense, setTense] = useState(tenses[0]);
+  const filtered = CONJUGATIONS.filter(c => c.tense === tense);
+  const [idx, setIdx] = useState(0);
+  const [inputs, setInputs] = useState({});
+  const [checked, setChecked] = useState(false);
+  const [score, setScore] = useState({ right: 0, total: 0 });
+  const conj = filtered[idx] || filtered[0];
+
+  useEffect(() => { setInputs({}); setChecked(false); }, [idx, tense]);
+
+  const check = () => {
+    if (checked) return;
+    let right = 0;
+    FORM_KEYS.forEach(k => { if (norm(inputs[k] || "") === norm(conj.forms[k])) right++; });
+    setScore(s => ({ right: s.right + right, total: s.total + 6 }));
+    setChecked(true);
+    if (right > 0) { awardXP && awardXP(right * 3); onAnswered && onAnswered(); }
+    speak(conj.verb);
+  };
+
+  const next = () => { setIdx(i => (i + 1) % filtered.length); };
+
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Home</button>
+      <div className="unit-banner">
+        <span className="lvtag">Premium · Conjugation</span>
+        <h2>Conjugation trainer</h2>
+        <p>Fill all 6 forms. Your memory builds the pattern — not reading a table.</p>
+      </div>
+      <div className="ref-tabs">
+        {tenses.map(t => <button key={t} className={`ref-tab ${tense === t ? "on" : ""}`} onClick={() => { setTense(t); setIdx(0); }}>{t}</button>)}
+      </div>
+      <div className="conj-card">
+        <div className="conj-verb">
+          <span className="conj-inf">{conj.verb}</span>
+          <span className="conj-meaning">{conj.meaning}</span>
+          <span className="conj-tense">{conj.tense}</span>
+          <button className="fc-say" onClick={() => speak(conj.verb)}>🔊</button>
+        </div>
+        <div className="conj-grid">
+          {FORM_KEYS.map((k, i) => {
+            const correct = checked && norm(inputs[k] || "") === norm(conj.forms[k]);
+            const wrong = checked && !correct;
+            return (
+              <div key={k} className={`conj-row ${checked ? (correct ? "right" : "wrong") : ""}`}>
+                <span className="conj-subj">{SUBJECTS[i]}</span>
+                <input className="conj-input" value={inputs[k] || ""} placeholder="…"
+                  readOnly={checked}
+                  onChange={e => setInputs(p => ({ ...p, [k]: e.target.value }))}
+                  onKeyDown={e => e.key === "Enter" && check()} />
+                {wrong && <span className="conj-ans">{conj.forms[k]}</span>}
+              </div>
+            );
+          })}
+        </div>
+        {!checked
+          ? <button className="cta wide" onClick={check}>Check answers</button>
+          : <button className="cta wide" onClick={next}>Next verb →</button>}
+        {score.total > 0 && <p className="conj-score">Session: {score.right}/{score.total} correct</p>}
+      </div>
+      <div className="conj-list">
+        <h3>Verbs in this tense</h3>
+        {filtered.map((c, i) => (
+          <button key={i} className={`conj-verb-btn ${i === idx ? "on" : ""}`} onClick={() => setIdx(i)}>
+            <b>{c.verb}</b><span>{c.meaning}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ---------- PHRASEBOOK ----------
+function Phrasebook({ progress, onExit }) {
+  const hasPaid = progress && progress.hasPaid;
+  const [cat, setCat] = useState(PHRASEBOOK[0].cat);
+  const section = PHRASEBOOK.find(p => p.cat === cat);
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Home</button>
+      <div className="unit-banner">
+        <span className="lvtag">Phrasebook</span>
+        <h2>Practical French phrases</h2>
+        <p>Tap any phrase to hear it. {!hasPaid && "Free categories open — unlock all for $4.99."}</p>
+      </div>
+      <div className="ref-tabs pb-tabs">
+        {PHRASEBOOK.map(p => (
+          <button key={p.cat} className={`ref-tab ${cat === p.cat ? "on" : ""} ${p.premium && !hasPaid ? "locked-tab" : ""}`}
+            onClick={() => setCat(p.cat)}>
+            {p.icon} {p.premium && !hasPaid ? "🔒 " : ""}{p.cat}
+          </button>
+        ))}
+      </div>
+      {section.premium && !hasPaid ? (
+        <div className="pb-lock">
+          <p>🔒 This category is part of the full phrasebook.</p>
+          <p>Unlock all 10 categories and 100+ phrases for <b>$4.99</b>.</p>
+        </div>
+      ) : (
+        <div className="pb-list">
+          {section.phrases.map((p, i) => (
+            <button key={i} className="pb-phrase" onClick={() => speak(p.fr)}>
+              <div className="pb-fr">{p.fr} <span className="dlg-spk">🔊</span></div>
+              <div className="pb-en">{p.en}</div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- CULTURAL NOTES ----------
+function CulturalNotes({ onExit }) {
+  const [open, setOpen] = useState(null);
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Home</button>
+      <div className="unit-banner">
+        <span className="lvtag">Culture</span>
+        <h2>Understanding France</h2>
+        <p>Language is only half the picture. Know how French people actually live.</p>
+      </div>
+      <div className="cn-list">
+        {CULTURAL_NOTES.map(n => (
+          <div key={n.id} className={`cn-card ${open === n.id ? "open" : ""}`}>
+            <button className="cn-head" onClick={() => setOpen(open === n.id ? null : n.id)}>
+              <span className="cn-emoji">{n.emoji}</span>
+              <span className="cn-title">{n.title}</span>
+              <span className="cn-chev">{open === n.id ? "−" : "+"}</span>
+            </button>
+            {open === n.id && <p className="cn-body">{n.body}</p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ---------- MISTAKE TRACKER ----------
+function MistakeTracker({ progress, onExit, onReview, onAnswered }) {
+  const mistakes = progress.mistakes || {};
+  const wordIds = Object.keys(mistakes).sort((a, b) => (mistakes[b] || 0) - (mistakes[a] || 0));
+  const [mode, setMode] = useState("list"); // list | drill
+  const [i, setI] = useState(0);
+  const [flip, setFlip] = useState(false);
+
+  if (wordIds.length === 0) {
+    return (
+      <div className="unit">
+        <button className="back" onClick={onExit}>← Home</button>
+        <div className="unit-banner"><span className="lvtag">Premium · Review</span><h2>Weak spots</h2></div>
+        <div className="result"><h2>No mistakes yet! 🎉</h2><p>Complete some drills first — your weak spots will appear here so you can target them.</p></div>
+      </div>
+    );
+  }
+
+  const words = wordIds.map(id => VOCAB_FLAT.find(w => w.id === id)).filter(Boolean).slice(0, 30);
+
+  if (mode === "drill" && words.length > 0) {
+    const w = words[i];
+    return (
+      <div className="unit">
+        <button className="back" onClick={() => { setMode("list"); setI(0); setFlip(false); }}>← List</button>
+        <div className="unit-banner"><span className="lvtag">Weak spots drill</span><h2>{words.length} words to fix</h2></div>
+        <div className="drill-top">
+          <div className="bar"><div className="bar-f" style={{ width: `${(i / words.length) * 100}%` }} /></div>
+          <span className="counter">{i + 1}/{words.length}</span>
+        </div>
+        <div className={`flashcard ${flip ? "flip" : ""}`} onClick={() => setFlip(true)}>
+          <div className="fc-inner">
+            <div className="fc-face fc-front">
+              <h2 className="fc-word">{withArticle(w)}</h2>
+              <button className="fc-say" onClick={e => { e.stopPropagation(); speak(withArticle(w)); }}>🔊 Hear</button>
+              {!flip && <p className="fc-hint">Recall… then tap to reveal</p>}
+            </div>
+            <div className="fc-face fc-back">
+              <h2 className="fc-en">{w.en}</h2>
+              {w.g && <p className="fc-art">{articleFor(w).trim()} · {w.g === "f" ? "feminine" : "masculine"}</p>}
+            </div>
+          </div>
+        </div>
+        {flip ? (
+          <div className="srs-rate">
+            <p className="srs-q">Did you know it?</p>
+            <div className="srs-btns">
+              {[["again","Again"],["hard","Hard"],["good","Good"],["easy","Easy"]].map(([k,lab]) => (
+                <button key={k} className={`srs-btn ${k}`} onClick={() => { onReview(w.id, SRS_RATINGS[k]); onAnswered && onAnswered(); if(i+1<words.length){setI(i+1);setFlip(false);}else setMode("done"); }}>{lab}</button>
+              ))}
+            </div>
+          </div>
+        ) : <button className="cta wide" onClick={() => setFlip(true)}>Reveal</button>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Home</button>
+      <div className="unit-banner"><span className="lvtag">Premium · Review</span><h2>Your weak spots</h2>
+        <p>Words you've gotten wrong most often — target these and you'll improve fastest.</p>
+      </div>
+      <button className="cta" onClick={() => setMode("drill")}>Drill my weak spots →</button>
+      <div className="mistake-list">
+        {words.map(w => (
+          <div key={w.id} className="mistake-row">
+            <div>
+              <b>{withArticle(w)}</b> <span className="ms-en">{w.en}</span>
+            </div>
+            <span className="ms-count">✗ {mistakes[w.id]}×</span>
+            <button className="fc-say sm" onClick={() => speak(withArticle(w))}>🔊</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ---------- WORD OF DAY ----------
+function WordOfDay({ onGoVocab }) {
+  const w = useMemo(() => VOCAB_FLAT[dayIdx() % VOCAB_FLAT.length], []);
+  return (
+    <div className="wod-card" onClick={() => speak(withArticle(w))}>
+      <div className="wod-head">
+        <span className="wod-label">Word of the day</span>
+        <button className="wod-say" onClick={e => { e.stopPropagation(); speak(withArticle(w)); }}>🔊</button>
+      </div>
+      <h3 className="wod-word">{withArticle(w)}</h3>
+      <p className="wod-en">{w.en}</p>
+      <p className="wod-ipa">/{w.ipa}/</p>
+      {w.g && <span className={`fc-gender ${w.g}`}>{w.g === "f" ? "feminine" : "masculine"}</span>}
+      <button className="wod-more" onClick={e => { e.stopPropagation(); onGoVocab(); }}>See all flashcards →</button>
+    </div>
+  );
+}
+
 
 
 // ---------- STYLES ----------
@@ -2248,6 +2878,84 @@ main{max-width:1000px;margin:0 auto;padding:30px 26px 50px;position:relative;z-i
 .dlg-phrase b{font-size:15px}
 .dlg-phrase span{font-size:13px;color:var(--soft);flex:1}
 
+/* ===== WORD OF DAY ===== */
+.wod-card{background:linear-gradient(135deg,var(--bleu),#5a6be0);color:#fff;border-radius:20px;padding:22px 24px;margin-bottom:20px;position:relative;overflow:hidden}
+.wod-card::before{content:"";position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08)}
+.wod-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.wod-label{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.wod-say{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer}
+.wod-word{font-family:'Fraunces',serif;font-size:36px;margin:0 0 4px}
+.wod-en{font-size:18px;opacity:.9;margin:0 0 4px}
+.wod-ipa{font-size:13px;opacity:.7;margin:0 0 10px}
+.wod-more{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:9px;padding:8px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px}
+.wod-more:hover{background:rgba(255,255,255,.3)}
+.wod-card .fc-gender{position:static;margin-top:6px;display:inline-block}
+
+/* ===== ACTION ROW (review + mistakes side by side) ===== */
+.action-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.review-banner.half{margin-bottom:0;flex-direction:column;align-items:flex-start;gap:8px;padding:16px}
+.review-banner.half .rev-badge{align-self:flex-end}
+.review-banner.mistakes{background:linear-gradient(110deg,var(--rouge),#e8703d)}
+.review-banner.dim{opacity:.7}
+
+/* ===== CONJUGATION ===== */
+.conj-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;margin-bottom:20px}
+.conj-verb{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.conj-inf{font-family:'Fraunces',serif;font-size:28px;color:var(--bleu)}
+.conj-meaning{font-size:14px;color:var(--soft)}
+.conj-tense{background:var(--bleu);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px}
+.conj-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.conj-row{display:grid;grid-template-columns:110px 1fr auto;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
+.conj-row:last-child{border:none}
+.conj-row.right .conj-input{border-color:var(--vert);background:#eafaf3}
+.conj-row.wrong .conj-input{border-color:var(--rouge);background:#fdeeec}
+.conj-subj{font-weight:700;font-size:14px;color:var(--soft)}
+.conj-input{border:1.5px solid var(--line);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:15px;background:var(--paper);color:var(--ink);outline:none;width:100%;transition:.13s}
+.conj-input:focus{border-color:var(--bleu)}
+.conj-ans{font-size:13px;font-weight:700;color:var(--vert);white-space:nowrap}
+.conj-score{text-align:center;font-size:13px;color:var(--soft);margin-top:10px}
+.conj-list{display:flex;flex-direction:column;gap:6px}
+.conj-list h3{font-family:'Fraunces',serif;margin-bottom:8px}
+.conj-verb-btn{display:flex;align-items:center;gap:10px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-family:inherit;cursor:pointer;transition:.13s}
+.conj-verb-btn:hover{border-color:var(--bleu)}
+.conj-verb-btn.on{border-color:var(--bleu);background:#edf0fd}
+.conj-verb-btn b{font-size:15px;color:var(--bleu)}
+.conj-verb-btn span{font-size:12px;color:var(--soft)}
+
+/* ===== PHRASEBOOK ===== */
+.pb-tabs{flex-wrap:wrap}
+.locked-tab{opacity:.7}
+.pb-lock{background:var(--card);border:1.5px dashed var(--line);border-radius:16px;padding:24px;text-align:center;margin-top:16px}
+.pb-lock p{margin:6px 0;font-size:15px}
+.pb-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.pb-phrase{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 16px;cursor:pointer;font-family:inherit;transition:.13s}
+.pb-phrase:hover{border-color:var(--rouge);transform:translateY(-1px)}
+.pb-fr{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.pb-en{font-size:13px;color:var(--soft)}
+
+/* ===== CULTURAL NOTES ===== */
+.cn-list{display:flex;flex-direction:column;gap:8px}
+.cn-card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:.15s}
+.cn-card:hover{border-color:var(--or)}
+.cn-head{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:none;padding:16px 18px;cursor:pointer;font-family:inherit}
+.cn-emoji{font-size:24px;flex-shrink:0}
+.cn-title{font-size:16px;font-weight:700;flex:1}
+.cn-chev{font-size:18px;color:var(--soft);font-weight:700}
+.cn-body{padding:0 18px 16px;font-size:15px;line-height:1.7;color:var(--soft);border-top:1px solid var(--line)}
+
+/* ===== MISTAKE TRACKER ===== */
+.mistake-list{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.mistake-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.mistake-row>div{flex:1;min-width:0}
+.ms-en{font-size:13px;color:var(--soft);margin-left:8px}
+.ms-count{font-size:13px;color:var(--rouge);font-weight:700;white-space:nowrap}
+.fc-say.sm{padding:6px 10px;font-size:13px}
+
+@media(max-width:520px){
+  .action-row{grid-template-columns:1fr}
+  .conj-row{grid-template-columns:80px 1fr auto}
+}
+
 /* ===== VOICE PICKER (clear, two-action rows) ===== */
 .voice-list{display:flex;flex-direction:column;gap:8px}
 .voice-row{display:flex;align-items:center;gap:12px;background:var(--paper);border:1.5px solid var(--line);
@@ -2320,6 +3028,7 @@ const blankProgress = () => ({
   history: {},         // dayIdx -> questions answered that day (for the calendar)
   settings: { audioSpeed: "normal", strictAccents: false, autoAdvance: false, voiceURI: null, pitch: 1 },
   srs: {},             // wordId -> spaced-repetition memory state
+  mistakes: {},        // wordId -> count of wrong answers
   joined: Date.now(),
 });
 
@@ -2388,7 +3097,7 @@ function signOut() {
 //  stores hasPaid on the user's account. See the build guide.
 // ============================================================
 const FREE_LEVELS = ["A1"];               // A1 free; A2–C1 are premium
-const PRICE_LABEL = "$5";                 // display only
+const PRICE_LABEL = "$4.99";                 // display only
 const isPremiumLevel = (lvl) => !FREE_LEVELS.includes(lvl);
 // Free taster: the FIRST unit of each premium level is playable for free,
 // so people taste real A2–C1 content before deciding to pay.
@@ -2866,9 +3575,11 @@ function Paywall({ onClose, onBuy, state }) {
         <h2 className="pw-title">Unlock every level</h2>
         <p className="pw-price"><b>{PRICE_LABEL}</b> <span>one-time · yours forever</span></p>
         <ul className="pw-list">
-          <li>{CURRICULUM.filter(l => isPremiumLevel(l.level)).reduce((s, l) => s + l.units.length, 0)} units across A2 → C1, beyond the free previews</li>
-          <li>{CURRICULUM.filter(l => isPremiumLevel(l.level)).reduce((s, l) => s + l.units.reduce((a, u) => a + u.ex.length, 0), 0)}+ exercises: grammar, conjugation, listening, word-building & fill-the-blank</li>
-          <li>Keep your stars, XP and streak across everything</li>
+          <li>{CURRICULUM.filter(l => isPremiumLevel(l.level)).reduce((s, l) => s + l.units.length, 0)} units across A2 → C1 — grammar, listening, conjugation, fill-in-the-blank & more</li>
+          <li>Full conjugation trainer — every major verb, every tense, all 6 forms drilled</li>
+          <li>Complete phrasebook — 100+ practical phrases across 10 real-life situations</li>
+          <li>Weak-spot tracker — your wrong answers, targeted for fastest improvement</li>
+          <li>{READING.filter(r=>r.premium).length} premium reading passages + {DIALOGUES.filter(d=>d.premium).length} premium dialogues</li>
           <li>One payment — no subscription, ever</li>
         </ul>
         {state === "done" ? (
@@ -2994,10 +3705,23 @@ function App() {
       const today = dayIdx();
       const srs = { ...(p.srs || {}) };
       srs[wordId] = scheduleCard(srs[wordId], rating, today);
-      return { ...p, srs };
+      // track mistakes — "again" means they didn't know it
+      const mistakes = { ...(p.mistakes || {}) };
+      if (rating === 0) mistakes[wordId] = (mistakes[wordId] || 0) + 1;
+      return { ...p, srs, mistakes };
     });
-    awardXP(rating === 0 ? 2 : 5); // small XP for reviewing; less if "again"
+    awardXP(rating === 0 ? 2 : 5);
   }, [persist, awardXP]);
+
+  // record a drill-wrong answer as a mistake (called from Unit drill)
+  const recordMistake = useCallback((wordId) => {
+    if (!wordId) return;
+    persist((p) => {
+      const mistakes = { ...(p.mistakes || {}) };
+      mistakes[wordId] = (mistakes[wordId] || 0) + 1;
+      return { ...p, mistakes };
+    });
+  }, [persist]);
 
   const changeSettings = useCallback((next) => {
     // update the live mirror immediately so it affects the current session
@@ -3100,21 +3824,32 @@ function App() {
             </div>
           </section>
 
+          <WordOfDay onGoVocab={() => setRoute({ name: "vocab" })} />
+
           <DailyGoalCard progress={progress} onChangeGoal={changeGoal} onPractise={() => setRoute({ name: "review" })} />
 
           {(() => {
             const due = countDue(progress.srs || {}, dayIdx());
+            const mistakeCount = Object.keys(progress.mistakes || {}).length;
             return (
-              <button className="review-banner" onClick={() => setRoute({ name: "review" })}>
-                <div className="rev-l">
+              <div className="action-row">
+                <button className="review-banner half" onClick={() => setRoute({ name: "review" })}>
                   <span className="rev-emoji">🔁</span>
                   <div>
                     <strong>Daily review</strong>
-                    <p>Spaced repetition — practise words right before you'd forget them</p>
+                    <p>Spaced repetition</p>
                   </div>
-                </div>
-                <span className="rev-badge">{due > 0 ? `${due} due →` : "Start →"}</span>
-              </button>
+                  <span className="rev-badge">{due > 0 ? `${due} due` : "Go →"}</span>
+                </button>
+                <button className={`review-banner half mistakes ${mistakeCount === 0 ? "dim" : ""}`} onClick={() => progress.hasPaid ? setRoute({ name: "mistakes" }) : setShowPaywall(true)}>
+                  <span className="rev-emoji">🎯</span>
+                  <div>
+                    <strong>Weak spots</strong>
+                    <p>{progress.hasPaid ? "Target your errors" : "Premium"}</p>
+                  </div>
+                  <span className="rev-badge">{mistakeCount > 0 ? `${mistakeCount} →` : "–"}</span>
+                </button>
+              </div>
             );
           })()}
 
@@ -3124,7 +3859,7 @@ function App() {
                 <span className="upsell-badge">✦</span>
                 <div>
                   <strong>Unlock the full course</strong>
-                  <p>All levels A2 → C1 · one payment of {PRICE_LABEL}, forever</p>
+                  <p>All levels A2 → C1, conjugation trainer, full phrasebook, weak-spot tracker · {PRICE_LABEL} forever</p>
                 </div>
               </div>
               <span className="upsell-cta">Unlock {PRICE_LABEL} →</span>
@@ -3134,23 +3869,35 @@ function App() {
           <div className="ref-cards ref-cards-3">
             <button className="ref-card" onClick={() => setRoute({ name: "vocab" })}>
               <span className="ref-emoji">🗂️</span>
-              <div><strong>Flashcard library</strong><p>{VOCAB_FLAT.length} voiced words — free</p></div>
-            </button>
-            <button className="ref-card" onClick={() => setRoute({ name: "grammar" })}>
-              <span className="ref-emoji">📖</span>
-              <div><strong>Grammar library</strong><p>Every rule, by level — free</p></div>
-            </button>
-            <button className="ref-card" onClick={() => setRoute({ name: "pronunciation" })}>
-              <span className="ref-emoji">🔊</span>
-              <div><strong>Pronunciation guide</strong><p>Sounds & IPA, spoken — free</p></div>
+              <div><strong>Flashcard library</strong><p>{VOCAB_FLAT.length} voiced words</p></div>
             </button>
             <button className="ref-card" onClick={() => setRoute({ name: "reading" })}>
               <span className="ref-emoji">📰</span>
-              <div><strong>Reading & comprehension</strong><p>{READING.length} graded texts with quizzes — free</p></div>
+              <div><strong>Reading</strong><p>{READING.length} graded texts</p></div>
             </button>
             <button className="ref-card" onClick={() => setRoute({ name: "dialogues" })}>
               <span className="ref-emoji">💬</span>
-              <div><strong>Real conversations</strong><p>{DIALOGUES.length} voiced dialogues — free</p></div>
+              <div><strong>Dialogues</strong><p>{DIALOGUES.length} real conversations</p></div>
+            </button>
+            <button className="ref-card" onClick={() => setRoute({ name: "phrasebook" })}>
+              <span className="ref-emoji">📋</span>
+              <div><strong>Phrasebook</strong><p>Practical French phrases</p></div>
+            </button>
+            <button className="ref-card" onClick={() => progress.hasPaid ? setRoute({ name: "conjugation" }) : setShowPaywall(true)}>
+              <span className="ref-emoji">📝</span>
+              <div><strong>Conjugation {!progress.hasPaid ? "🔒" : ""}</strong><p>Verb drills, all tenses</p></div>
+            </button>
+            <button className="ref-card" onClick={() => setRoute({ name: "grammar" })}>
+              <span className="ref-emoji">📖</span>
+              <div><strong>Grammar</strong><p>Every rule, by level</p></div>
+            </button>
+            <button className="ref-card" onClick={() => setRoute({ name: "pronunciation" })}>
+              <span className="ref-emoji">🔊</span>
+              <div><strong>Pronunciation</strong><p>IPA guide, spoken</p></div>
+            </button>
+            <button className="ref-card" onClick={() => setRoute({ name: "culture" })}>
+              <span className="ref-emoji">🇫🇷</span>
+              <div><strong>Culture notes</strong><p>Real French life</p></div>
             </button>
           </div>
 
@@ -3256,7 +4003,19 @@ function App() {
           onExit={() => setRoute({ name: "home" })} /></main>
       )}
       {route.name === "dialogues" && (
-        <main className="page"><DialogueLibrary onExit={() => setRoute({ name: "home" })} /></main>
+        <main className="page"><DialogueLibrary progress={progress} onExit={() => setRoute({ name: "home" })} /></main>
+      )}
+      {route.name === "conjugation" && (
+        <main className="page"><ConjugationTrainer onExit={() => setRoute({ name: "home" })} awardXP={awardXP} onAnswered={recordAnswer} /></main>
+      )}
+      {route.name === "phrasebook" && (
+        <main className="page"><Phrasebook progress={progress} onExit={() => setRoute({ name: "home" })} /></main>
+      )}
+      {route.name === "culture" && (
+        <main className="page"><CulturalNotes onExit={() => setRoute({ name: "home" })} /></main>
+      )}
+      {route.name === "mistakes" && (
+        <main className="page"><MistakeTracker progress={progress} onExit={() => setRoute({ name: "home" })} onReview={reviewCard} onAnswered={recordAnswer} /></main>
       )}
 
       <footer className="bottom">French with Halle · signed in as {user.name} · <em>bon courage</em></footer>
