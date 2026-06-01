@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Le Parcours · Learn French A1 → C1</title>
-<style>html,body{margin:0;padding:0;background:#f4efe6}#root{min-height:100vh}</style>
+<title>French with Halle · Learn French A1 → C1</title>
+<style>html,body{margin:0;padding:0;background:#fbf7f2}#root{min-height:100vh}</style>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -15,14 +15,14 @@
 const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
 /* ============================================================
-   LE PARCOURS — A French course from A1 to C1
-   Editorial design · multi-mode practice · challenge mode
+   FRENCH WITH HALLE — Gamified French (A1 → C1)
+   Profiles · saved progress · locked level progression · stars
+   ------------------------------------------------------------
+   NOTE ON ACCOUNTS: This build registers each user locally by
+   email (first/last name, email, phone) so it works offline as a
+   single file. The registerUser() function is isolated so it can be
+   swapped for a real backend account system later — see the guide.
    ============================================================ */
-
-// ---------- CURRICULUM ----------
-// Each level → units → each unit has vocab, a grammar note, and an exercise set
-// Exercise kinds: flashcard (learn), translate (type FR), choice (multiple choice),
-// build (word-order), listen (type what you hear), conjugate (fill verb form)
 
 const CURRICULUM = [
   {
@@ -44,6 +44,7 @@ const CURRICULUM = [
           { k: "translate", q: "Pleased to meet you", a: "Enchanté" },
           { k: "listen", a: "Bonsoir", q: "Type what you hear" },
           { k: "choice", q: "“You're welcome”, formal:", a: "Je vous en prie", opts: ["De rien", "Je vous en prie", "Pas de souci"] },
+          { k: "cloze", q: "___, je m'appelle Marie.", a: "Bonjour", en: "Hello, my name is Marie.", note: "a greeting" },
         ],
       },
       {
@@ -61,6 +62,7 @@ const CURRICULUM = [
           { k: "conjugate", q: "Nous ____ (avoir) faim.", subj: "Nous", a: "avons", verb: "avoir" },
           { k: "choice", q: "“They are happy” →", a: "Ils sont contents", opts: ["Ils ont contents", "Ils sont contents", "Ils est content"] },
           { k: "translate", q: "I have a cat (un chat)", a: "J'ai un chat" },
+          { k: "cloze", q: "Elle ___ étudiante.", a: "est", en: "She is a student.", note: "être, 3rd person" },
         ],
       },
       {
@@ -78,6 +80,29 @@ const CURRICULUM = [
           { k: "choice", q: "“Half past” is…", a: "et demie", opts: ["et quart", "et demie", "moins le quart"] },
           { k: "listen", a: "Demain", q: "Type what you hear" },
           { k: "build", q: "Build: “It's noon”", a: "Il est midi", tiles: ["midi", "Il", "est"] },
+          { k: "cloze", q: "Il est trois ___ et quart.", a: "heures", en: "It's quarter past three.", note: "the word for hours/o'clock" },
+        ],
+      },
+      {
+        id: "a1-family", title: "La Famille & Couleurs", focus: "Family, colours, possessives",
+        grammar: { t: "My / your (mon, ma, mes)", b: "Possessives agree with the noun, not the owner: mon père (my father), ma mère (my mother), mes parents (my parents). Use mon before a feminine word starting with a vowel: mon amie." },
+        vocab: [
+          { fr: "La famille", en: "The family", ipa: "la famij" },
+          { fr: "Le père", en: "The father", ipa: "lə pɛʁ" },
+          { fr: "La mère", en: "The mother", ipa: "la mɛʁ" },
+          { fr: "Le frère", en: "The brother", ipa: "lə fʁɛʁ" },
+          { fr: "La sœur", en: "The sister", ipa: "la sœʁ" },
+          { fr: "Rouge", en: "Red", ipa: "ʁuʒ" },
+          { fr: "Bleu", en: "Blue", ipa: "blø" },
+          { fr: "Vert", en: "Green", ipa: "vɛʁ" },
+        ],
+        ex: [
+          { k: "translate", q: "The mother", a: "La mère" },
+          { k: "choice", q: "“My sister” →", a: "ma sœur", opts: ["mon sœur", "ma sœur", "mes sœur"] },
+          { k: "choice", q: "Which means “green”?", a: "Vert", opts: ["Bleu", "Rouge", "Vert"] },
+          { k: "listen", a: "Le frère", q: "Type what you hear" },
+          { k: "build", q: "Build: “my parents”", a: "mes parents", tiles: ["mes", "parents"] },
+          { k: "cloze", q: "Voici ___ père et ma mère.", a: "mon", en: "Here are my father and my mother.", note: "possessive, masculine" },
         ],
       },
     ],
@@ -101,6 +126,7 @@ const CURRICULUM = [
           { k: "conjugate", q: "Tu ____ (habiter) à Lyon.", subj: "Tu", a: "habites", verb: "habiter" },
           { k: "translate", q: "I eat bread (du pain)", a: "Je mange du pain" },
           { k: "choice", q: "“They work” →", a: "Ils travaillent", opts: ["Ils travaillez", "Ils travaillent", "Ils travailles"] },
+          { k: "cloze", q: "Vous ___ (écouter) la radio.", a: "écoutez", en: "You listen to the radio.", note: "-ER ending for vous" },
         ],
       },
       {
@@ -118,6 +144,7 @@ const CURRICULUM = [
           { k: "build", q: "Build: “We finished”", a: "Nous avons fini", tiles: ["fini", "Nous", "avons"] },
           { k: "choice", q: "“I went” uses…", a: "être", opts: ["avoir", "être", "faire"] },
           { k: "listen", a: "Hier", q: "Type what you hear" },
+          { k: "cloze", q: "Hier, j'___ mangé une pomme.", a: "ai", en: "Yesterday, I ate an apple.", note: "auxiliary verb" },
         ],
       },
       {
@@ -135,6 +162,50 @@ const CURRICULUM = [
           { k: "translate", q: "I would like", a: "Je voudrais" },
           { k: "choice", q: "“Some water (l'eau)” →", a: "de l'eau", opts: ["du eau", "de l'eau", "des eau"] },
           { k: "build", q: "Build: “How much is it”", a: "Combien ça coûte", tiles: ["ça", "Combien", "coûte"] },
+          { k: "cloze", q: "Je voudrais ___ pain, s'il vous plaît.", a: "du", en: "I would like some bread, please.", note: "partitive, masculine" },
+        ],
+      },
+      {
+        id: "a2-routine", title: "La Routine", focus: "Reflexive verbs & daily life",
+        grammar: { t: "Reflexive verbs (se laver)", b: "The action returns to the subject, marked by a reflexive pronoun: je me lève (I get up), tu te laves (you wash), il se couche (he goes to bed). The pronoun changes with the subject: me, te, se, nous, vous, se." },
+        vocab: [
+          { fr: "Se réveiller", en: "To wake up", ipa: "sə ʁevɛje" },
+          { fr: "Se lever", en: "To get up", ipa: "sə ləve" },
+          { fr: "S'habiller", en: "To get dressed", ipa: "sabije" },
+          { fr: "Se coucher", en: "To go to bed", ipa: "sə kuʃe" },
+          { fr: "Le matin", en: "The morning", ipa: "lə matɛ̃" },
+          { fr: "Le soir", en: "The evening", ipa: "lə swaʁ" },
+          { fr: "Tous les jours", en: "Every day", ipa: "tu le ʒuʁ" },
+        ],
+        ex: [
+          { k: "translate", q: "To get up", a: "Se lever" },
+          { k: "conjugate", q: "Je ____ (se lever) à sept heures.", subj: "Je", a: "me lève", verb: "se lever" },
+          { k: "choice", q: "“He goes to bed” →", a: "Il se couche", opts: ["Il me couche", "Il se couche", "Il te couche"] },
+          { k: "listen", a: "Le matin", q: "Type what you hear" },
+          { k: "build", q: "Build: “every day”", a: "tous les jours", tiles: ["les", "tous", "jours"] },
+          { k: "cloze", q: "Le soir, je ___ couche tard.", a: "me", en: "In the evening, I go to bed late.", note: "reflexive pronoun, je" },
+        ],
+      },
+      {
+        id: "a2-weather", title: "Le Temps & Saisons", focus: "Weather, seasons, small talk",
+        grammar: { t: "Il fait + weather", b: "Weather usually uses the impersonal il fait: il fait beau (it's nice), il fait froid (it's cold), il fait chaud (it's hot). Some use other verbs: il pleut (it's raining), il neige (it's snowing), il y a du vent (it's windy)." },
+        vocab: [
+          { fr: "Il fait beau", en: "It's nice out", ipa: "il fɛ bo" },
+          { fr: "Il fait froid", en: "It's cold", ipa: "il fɛ fʁwa" },
+          { fr: "Il pleut", en: "It's raining", ipa: "il plø" },
+          { fr: "Il neige", en: "It's snowing", ipa: "il nɛʒ" },
+          { fr: "Le printemps", en: "Spring", ipa: "lə pʁɛ̃tɑ̃" },
+          { fr: "L'été", en: "Summer", ipa: "lete" },
+          { fr: "L'automne", en: "Autumn", ipa: "lotɔn" },
+          { fr: "L'hiver", en: "Winter", ipa: "livɛʁ" },
+        ],
+        ex: [
+          { k: "translate", q: "It's raining", a: "Il pleut" },
+          { k: "choice", q: "“It's cold” →", a: "Il fait froid", opts: ["Il est froid", "Il fait froid", "Il y a froid"] },
+          { k: "choice", q: "Which season is “summer”?", a: "L'été", opts: ["Le printemps", "L'été", "L'hiver"] },
+          { k: "listen", a: "Il neige", q: "Type what you hear" },
+          { k: "build", q: "Build: “It's nice out”", a: "Il fait beau", tiles: ["beau", "Il", "fait"] },
+          { k: "cloze", q: "En hiver, il ___ froid.", a: "fait", en: "In winter, it's cold.", note: "weather verb" },
         ],
       },
     ],
@@ -158,6 +229,7 @@ const CURRICULUM = [
           { k: "conjugate", q: "Nous ____ (aller) à Paris.", subj: "Nous", a: "irons", verb: "aller (futur)" },
           { k: "translate", q: "Maybe", a: "Peut-être" },
           { k: "choice", q: "Future of “faire” (je) →", a: "ferai", opts: ["faisai", "ferai", "fairai"] },
+          { k: "cloze", q: "Demain, nous ___ (aller) à la plage.", a: "irons", en: "Tomorrow, we will go to the beach.", note: "aller, futur, nous" },
         ],
       },
       {
@@ -175,6 +247,48 @@ const CURRICULUM = [
           { k: "choice", q: "A contrast connector:", a: "Cependant", opts: ["Donc", "Cependant", "Aussi"] },
           { k: "build", q: "Build: “I think that…”", a: "Je pense que", tiles: ["que", "Je", "pense"] },
           { k: "listen", a: "En revanche", q: "Type what you hear" },
+          { k: "cloze", q: "Je ___ que c'est une bonne idée.", a: "pense", en: "I think that it's a good idea.", note: "verb of opinion" },
+        ],
+      },
+      {
+        id: "b1-imp", title: "L'Imparfait", focus: "The descriptive past",
+        grammar: { t: "Imparfait", b: "The “background” past — habits, descriptions, things that were ongoing. Take the nous form of the present, drop -ons, add -ais, -ais, -ait, -ions, -iez, -aient. Parler → nous parlons → je parlais (I used to speak / was speaking). It pairs with passé composé to tell stories." },
+        vocab: [
+          { fr: "Je parlais", en: "I was speaking", ipa: "ʒə paʁlɛ" },
+          { fr: "C'était", en: "It was", ipa: "setɛ" },
+          { fr: "Quand j'étais petit", en: "When I was little", ipa: "kɑ̃ ʒetɛ pəti" },
+          { fr: "Souvent", en: "Often", ipa: "suvɑ̃" },
+          { fr: "Autrefois", en: "In the past", ipa: "otʁəfwa" },
+          { fr: "Toujours", en: "Always", ipa: "tuʒuʁ" },
+        ],
+        ex: [
+          { k: "translate", q: "It was", a: "C'était" },
+          { k: "conjugate", q: "Quand j'étais jeune, je ____ (jouer) souvent.", subj: "Je", a: "jouais", verb: "jouer (imparfait)" },
+          { k: "choice", q: "Imparfait is used for…", a: "habits & descriptions", opts: ["a finished single action", "habits & descriptions", "the future"] },
+          { k: "listen", a: "Souvent", q: "Type what you hear" },
+          { k: "build", q: "Build: “when I was little”", a: "quand j'étais petit", tiles: ["petit", "quand", "j'étais"] },
+          { k: "cloze", q: "Autrefois, nous ___ (habiter) à Paris.", a: "habitions", en: "In the past, we used to live in Paris.", note: "imparfait, nous" },
+        ],
+      },
+      {
+        id: "b1-travel", title: "En Voyage", focus: "Travel, directions, getting around",
+        grammar: { t: "Imperative (giving directions)", b: "To give an instruction, drop the subject and use the verb directly: Tournez à gauche (turn left), Continuez tout droit (keep straight), Prenez la deuxième rue (take the second street). -ER verbs drop the final -s in the tu form: Tourne ! " },
+        vocab: [
+          { fr: "Tournez à gauche", en: "Turn left", ipa: "tuʁne a ɡoʃ" },
+          { fr: "Tournez à droite", en: "Turn right", ipa: "tuʁne a dʁwat" },
+          { fr: "Tout droit", en: "Straight ahead", ipa: "tu dʁwa" },
+          { fr: "La gare", en: "The station", ipa: "la ɡaʁ" },
+          { fr: "L'aéroport", en: "The airport", ipa: "laeʁopɔʁ" },
+          { fr: "Un billet", en: "A ticket", ipa: "œ̃ bijɛ" },
+          { fr: "À quelle heure", en: "At what time", ipa: "a kɛl œʁ" },
+        ],
+        ex: [
+          { k: "translate", q: "Turn right", a: "Tournez à droite" },
+          { k: "choice", q: "“Straight ahead” →", a: "Tout droit", opts: ["À gauche", "Tout droit", "À droite"] },
+          { k: "choice", q: "Where do you catch a train?", a: "La gare", opts: ["L'aéroport", "La gare", "Le billet"] },
+          { k: "listen", a: "Un billet", q: "Type what you hear" },
+          { k: "build", q: "Build: “at what time”", a: "À quelle heure", tiles: ["quelle", "À", "heure"] },
+          { k: "cloze", q: "Pour la gare, ___ à gauche.", a: "tournez", en: "For the station, turn left.", note: "imperative, vous" },
         ],
       },
     ],
@@ -198,6 +312,7 @@ const CURRICULUM = [
           { k: "conjugate", q: "Bien qu'il ____ (être) tard.", subj: "qu'il", a: "soit", verb: "être (subj)" },
           { k: "choice", q: "Which triggers subjunctive?", a: "Il faut que", opts: ["Je sais que", "Il faut que", "Je pense que"] },
           { k: "translate", q: "Although (conjunction)", a: "Bien que" },
+          { k: "cloze", q: "Il faut que tu ___ (être) patient.", a: "sois", en: "You need to be patient.", note: "être, subjunctive, tu" },
         ],
       },
       {
@@ -215,6 +330,48 @@ const CURRICULUM = [
           { k: "conjugate", q: "Je ____ (pouvoir, cond.) aider.", subj: "Je", a: "pourrais", verb: "pouvoir (cond)" },
           { k: "translate", q: "It would be", a: "Ce serait" },
           { k: "choice", q: "Si + imparfait pairs with…", a: "conditionnel", opts: ["futur", "conditionnel", "présent"] },
+          { k: "cloze", q: "Si j'étais riche, je ___ (voyager) partout.", a: "voyagerais", en: "If I were rich, I would travel everywhere.", note: "conditional, je" },
+        ],
+      },
+      {
+        id: "b2-rel", title: "Les Pronoms Relatifs", focus: "qui, que, dont, où",
+        grammar: { t: "Relative pronouns", b: "They link two clauses into one. qui = subject (l'homme qui parle — the man who speaks); que = object (le livre que je lis — the book that I read); dont = of/about which or whose (le film dont je parle — the film I'm talking about); où = where/when (la ville où j'habite)." },
+        vocab: [
+          { fr: "Qui", en: "who / which (subject)", ipa: "ki" },
+          { fr: "Que", en: "that / which (object)", ipa: "kə" },
+          { fr: "Dont", en: "of which / whose", ipa: "dɔ̃" },
+          { fr: "Où", en: "where / when", ipa: "u" },
+          { fr: "Celui qui", en: "the one who", ipa: "səlɥi ki" },
+          { fr: "Ce que", en: "what (that which)", ipa: "sə kə" },
+        ],
+        ex: [
+          { k: "choice", q: "“The man who speaks” → l'homme ___ parle", a: "qui", opts: ["qui", "que", "dont"] },
+          { k: "choice", q: "“The book that I read” → le livre ___ je lis", a: "que", opts: ["qui", "que", "où"] },
+          { k: "choice", q: "“The film I'm talking about” uses…", a: "dont", opts: ["qui", "dont", "où"] },
+          { k: "translate", q: "where / when (relative)", a: "Où" },
+          { k: "build", q: "Build: “the one who”", a: "celui qui", tiles: ["qui", "celui"] },
+          { k: "cloze", q: "Voilà la maison ___ je suis né.", a: "où", en: "There's the house where I was born.", note: "place relative" },
+        ],
+      },
+      {
+        id: "b2-work", title: "Le Monde du Travail", focus: "Work, careers, formal email",
+        grammar: { t: "Formal register", b: "Professional French is more formal: use vous, and set phrases like Je vous prie d'agréer… (formal sign-off), Veuillez trouver ci-joint… (please find attached). Conditional softens requests: Je souhaiterais (I would like), Pourriez-vous (could you)." },
+        vocab: [
+          { fr: "Un entretien", en: "An interview", ipa: "œ̃n‿ɑ̃tʁətjɛ̃" },
+          { fr: "Une réunion", en: "A meeting", ipa: "yn ʁeynjɔ̃" },
+          { fr: "Un collègue", en: "A colleague", ipa: "œ̃ kɔlɛɡ" },
+          { fr: "L'entreprise", en: "The company", ipa: "lɑ̃tʁəpʁiz" },
+          { fr: "Le salaire", en: "The salary", ipa: "lə salɛʁ" },
+          { fr: "Ci-joint", en: "Attached (in email)", ipa: "si ʒwɛ̃" },
+          { fr: "Cordialement", en: "Kind regards", ipa: "kɔʁdjalmɑ̃" },
+        ],
+        ex: [
+          { k: "translate", q: "A meeting", a: "Une réunion" },
+          { k: "choice", q: "Formal email sign-off:", a: "Cordialement", opts: ["Salut", "Cordialement", "Bisous"] },
+          { k: "choice", q: "“Please find attached” uses…", a: "Ci-joint", opts: ["Ci-joint", "Là-bas", "D'accord"] },
+          { k: "listen", a: "L'entreprise", q: "Type what you hear" },
+          { k: "build", q: "Build: “a colleague”", a: "un collègue", tiles: ["collègue", "un"] },
+          { k: "cloze", q: "Pourriez-___ m'envoyer le rapport ?", a: "vous", en: "Could you send me the report?", note: "formal you" },
         ],
       },
     ],
@@ -238,6 +395,7 @@ const CURRICULUM = [
           { k: "choice", q: "To faint →", a: "Tomber dans les pommes", opts: ["Tomber dans les pommes", "Avoir le cafard", "Casser les pieds"] },
           { k: "translate", q: "Love at first sight (idiom)", a: "Avoir un coup de foudre" },
           { k: "choice", q: "“Avoir le cafard” =", a: "To feel down", opts: ["To be hungry", "To feel down", "To be lucky"] },
+          { k: "cloze", q: "Quand il l'a vue, ce fut le coup de ___.", a: "foudre", en: "When he saw her, it was love at first sight.", note: "completes the idiom" },
         ],
       },
       {
@@ -255,11 +413,218 @@ const CURRICULUM = [
           { k: "choice", q: "“Il parla” is which tense?", a: "Passé simple", opts: ["Passé composé", "Passé simple", "Imparfait"] },
           { k: "choice", q: "Most formal “however”:", a: "Toutefois", opts: ["Mais", "Toutefois", "Mais bon"] },
           { k: "listen", a: "Désormais", q: "Type what you hear" },
+          { k: "cloze", q: "___, il faudra travailler plus dur.", a: "Désormais", en: "From now on, we'll have to work harder.", note: "formal “from now on”" },
+        ],
+      },
+      {
+        id: "c1-arg", title: "Argumenter", focus: "Connectors for sophisticated argument",
+        grammar: { t: "Linking ideas", b: "Advanced French leans on precise connectors to structure an argument: en effet (indeed), par ailleurs (moreover), en revanche (on the other hand), par conséquent (consequently), or (now/yet — introduces a turn). Using them well is what makes writing sound truly fluent." },
+        vocab: [
+          { fr: "En effet", en: "Indeed", ipa: "ɑ̃n‿efɛ" },
+          { fr: "Par ailleurs", en: "Moreover", ipa: "paʁ‿ajœʁ" },
+          { fr: "Par conséquent", en: "Consequently", ipa: "paʁ kɔ̃sekɑ̃" },
+          { fr: "En somme", en: "In short", ipa: "ɑ̃ sɔm" },
+          { fr: "Dans la mesure où", en: "Insofar as", ipa: "dɑ̃ la məzyʁ u" },
+          { fr: "Force est de constater", en: "One must acknowledge", ipa: "fɔʁs ɛ də kɔ̃state" },
+        ],
+        ex: [
+          { k: "translate", q: "Consequently", a: "Par conséquent" },
+          { k: "choice", q: "Which connector introduces a conclusion?", a: "En somme", opts: ["Par ailleurs", "En somme", "En effet"] },
+          { k: "choice", q: "“Moreover” →", a: "Par ailleurs", opts: ["En revanche", "Par ailleurs", "Or"] },
+          { k: "listen", a: "En effet", q: "Type what you hear" },
+          { k: "build", q: "Build: “in short”", a: "En somme", tiles: ["En", "somme"] },
+          { k: "cloze", q: "Il pleut ; par ___, le match est annulé.", a: "conséquent", en: "It's raining; consequently, the match is cancelled.", note: "completes the connector" },
+        ],
+      },
+      {
+        id: "c1-culture", title: "Culture & Subtilité", focus: "Cultural nuance & precise vocabulary",
+        grammar: { t: "Faux amis (false friends)", b: "Some French words look English but mean something else: actuellement = currently (not “actually”), sensible = sensitive (not “sensible”), assister à = to attend (not “assist”), éventuellement = possibly (not “eventually”). Knowing these marks an advanced speaker." },
+        vocab: [
+          { fr: "Actuellement", en: "Currently (not “actually”)", ipa: "aktɥɛlmɑ̃" },
+          { fr: "Sensible", en: "Sensitive (not “sensible”)", ipa: "sɑ̃sibl" },
+          { fr: "Assister à", en: "To attend", ipa: "asiste a" },
+          { fr: "La nuance", en: "The subtlety", ipa: "la nɥɑ̃s" },
+          { fr: "Le quotidien", en: "Daily life", ipa: "lə kɔtidjɛ̃" },
+          { fr: "Épanoui", en: "Fulfilled / flourishing", ipa: "epanwi" },
+          { fr: "Le dépaysement", en: "Sense of being abroad", ipa: "lə depɛizmɑ̃" },
+        ],
+        ex: [
+          { k: "choice", q: "“Actuellement” means…", a: "currently", opts: ["actually", "currently", "occasionally"] },
+          { k: "choice", q: "“Sensible” in French means…", a: "sensitive", opts: ["sensible", "sensitive", "reasonable"] },
+          { k: "translate", q: "To attend (an event)", a: "Assister à" },
+          { k: "listen", a: "La nuance", q: "Type what you hear" },
+          { k: "build", q: "Build: “daily life”", a: "le quotidien", tiles: ["quotidien", "le"] },
+          { k: "cloze", q: "Je suis ___ très occupé.", a: "actuellement", en: "I'm currently very busy.", note: "false friend for “currently”" },
         ],
       },
     ],
   },
 ];
+
+// ============================================================
+//  VOCABULARY LIBRARY  (voiced flashcards + spaced repetition source)
+//  Each entry: fr (base word), en, g ("m"|"f"|null for non-nouns),
+//  ipa, and optional ex (example sentence) + exEn.
+//  The definite article (le/la/l'/les) is derived from gender so
+//  learners absorb it automatically — see articleFor().
+//  Curated for accuracy; grouped by theme and CEFR-ish level so the
+//  set can keep growing without repeats.
+// ============================================================
+const VOCAB = {
+  "Essentials": [
+    { fr: "bonjour", en: "hello", g: null, ipa: "bɔ̃ʒuʁ" },
+    { fr: "merci", en: "thank you", g: null, ipa: "mɛʁsi" },
+    { fr: "oui", en: "yes", g: null, ipa: "wi" },
+    { fr: "non", en: "no", g: null, ipa: "nɔ̃" },
+    { fr: "peut-être", en: "maybe", g: null, ipa: "pø tɛtʁ" },
+    { fr: "aujourd'hui", en: "today", g: null, ipa: "oʒuʁdɥi" },
+    { fr: "demain", en: "tomorrow", g: null, ipa: "dəmɛ̃" },
+    { fr: "maintenant", en: "now", g: null, ipa: "mɛ̃tnɑ̃" },
+  ],
+  "People & Family": [
+    { fr: "femme", en: "woman / wife", g: "f", ipa: "fam" },
+    { fr: "homme", en: "man", g: "m", ipa: "ɔm" },
+    { fr: "enfant", en: "child", g: "m", ipa: "ɑ̃fɑ̃" },
+    { fr: "ami", en: "friend (m)", g: "m", ipa: "ami" },
+    { fr: "amie", en: "friend (f)", g: "f", ipa: "ami" },
+    { fr: "famille", en: "family", g: "f", ipa: "famij" },
+    { fr: "père", en: "father", g: "m", ipa: "pɛʁ" },
+    { fr: "mère", en: "mother", g: "f", ipa: "mɛʁ" },
+    { fr: "fille", en: "girl / daughter", g: "f", ipa: "fij" },
+    { fr: "garçon", en: "boy", g: "m", ipa: "ɡaʁsɔ̃" },
+  ],
+  "Food & Drink": [
+    { fr: "pain", en: "bread", g: "m", ipa: "pɛ̃" },
+    { fr: "fromage", en: "cheese", g: "m", ipa: "fʁɔmaʒ" },
+    { fr: "eau", en: "water", g: "f", ipa: "o" },
+    { fr: "vin", en: "wine", g: "m", ipa: "vɛ̃" },
+    { fr: "café", en: "coffee", g: "m", ipa: "kafe" },
+    { fr: "pomme", en: "apple", g: "f", ipa: "pɔm" },
+    { fr: "œuf", en: "egg", g: "m", ipa: "œf" },
+    { fr: "poisson", en: "fish", g: "m", ipa: "pwasɔ̃" },
+    { fr: "viande", en: "meat", g: "f", ipa: "vjɑ̃d" },
+    { fr: "légume", en: "vegetable", g: "m", ipa: "leɡym" },
+  ],
+  "Home & City": [
+    { fr: "maison", en: "house", g: "f", ipa: "mɛzɔ̃" },
+    { fr: "ville", en: "city / town", g: "f", ipa: "vil" },
+    { fr: "rue", en: "street", g: "f", ipa: "ʁy" },
+    { fr: "voiture", en: "car", g: "f", ipa: "vwatyʁ" },
+    { fr: "magasin", en: "shop", g: "m", ipa: "maɡazɛ̃" },
+    { fr: "gare", en: "train station", g: "f", ipa: "ɡaʁ" },
+    { fr: "école", en: "school", g: "f", ipa: "ekɔl" },
+    { fr: "travail", en: "work", g: "m", ipa: "tʁavaj" },
+    { fr: "chambre", en: "bedroom", g: "f", ipa: "ʃɑ̃bʁ" },
+    { fr: "porte", en: "door", g: "f", ipa: "pɔʁt" },
+  ],
+  "Nature & Time": [
+    { fr: "jour", en: "day", g: "m", ipa: "ʒuʁ" },
+    { fr: "nuit", en: "night", g: "f", ipa: "nɥi" },
+    { fr: "soleil", en: "sun", g: "m", ipa: "sɔlɛj" },
+    { fr: "lune", en: "moon", g: "f", ipa: "lyn" },
+    { fr: "mer", en: "sea", g: "f", ipa: "mɛʁ" },
+    { fr: "montagne", en: "mountain", g: "f", ipa: "mɔ̃taɲ" },
+    { fr: "arbre", en: "tree", g: "m", ipa: "aʁbʁ" },
+    { fr: "fleur", en: "flower", g: "f", ipa: "flœʁ" },
+    { fr: "temps", en: "time / weather", g: "m", ipa: "tɑ̃" },
+    { fr: "année", en: "year", g: "f", ipa: "ane" },
+  ],
+  "Common Verbs": [
+    { fr: "être", en: "to be", g: null, ipa: "ɛtʁ" },
+    { fr: "avoir", en: "to have", g: null, ipa: "avwaʁ" },
+    { fr: "faire", en: "to do / make", g: null, ipa: "fɛʁ" },
+    { fr: "aller", en: "to go", g: null, ipa: "ale" },
+    { fr: "dire", en: "to say", g: null, ipa: "diʁ" },
+    { fr: "voir", en: "to see", g: null, ipa: "vwaʁ" },
+    { fr: "savoir", en: "to know", g: null, ipa: "savwaʁ" },
+    { fr: "venir", en: "to come", g: null, ipa: "vəniʁ" },
+    { fr: "vouloir", en: "to want", g: null, ipa: "vulwaʁ" },
+    { fr: "pouvoir", en: "to be able to", g: null, ipa: "puvwaʁ" },
+  ],
+  "Adjectives": [
+    { fr: "grand", en: "big / tall", g: null, ipa: "ɡʁɑ̃" },
+    { fr: "petit", en: "small", g: null, ipa: "pəti" },
+    { fr: "bon", en: "good", g: null, ipa: "bɔ̃" },
+    { fr: "mauvais", en: "bad", g: null, ipa: "movɛ" },
+    { fr: "beau", en: "beautiful", g: null, ipa: "bo" },
+    { fr: "nouveau", en: "new", g: null, ipa: "nuvo" },
+    { fr: "vieux", en: "old", g: null, ipa: "vjø" },
+    { fr: "heureux", en: "happy", g: null, ipa: "œʁø" },
+    { fr: "facile", en: "easy", g: null, ipa: "fasil" },
+    { fr: "difficile", en: "difficult", g: null, ipa: "difisil" },
+  ],
+  "Travel & Work": [
+    { fr: "voyage", en: "trip", g: "m", ipa: "vwajaʒ" },
+    { fr: "billet", en: "ticket", g: "m", ipa: "bijɛ" },
+    { fr: "avion", en: "plane", g: "m", ipa: "avjɔ̃" },
+    { fr: "hôtel", en: "hotel", g: "m", ipa: "otɛl" },
+    { fr: "valise", en: "suitcase", g: "f", ipa: "valiz" },
+    { fr: "réunion", en: "meeting", g: "f", ipa: "ʁeynjɔ̃" },
+    { fr: "bureau", en: "office / desk", g: "m", ipa: "byʁo" },
+    { fr: "argent", en: "money / silver", g: "m", ipa: "aʁʒɑ̃" },
+    { fr: "entreprise", en: "company", g: "f", ipa: "ɑ̃tʁəpʁiz" },
+    { fr: "projet", en: "project", g: "m", ipa: "pʁɔʒɛ" },
+  ],
+};
+// Build a flat list with stable ids for the SRS.
+const VOCAB_FLAT = Object.entries(VOCAB).flatMap(([theme, words]) =>
+  words.map((w, i) => ({ ...w, theme, id: theme.toLowerCase().replace(/[^a-z]/g, "") + "-" + i }))
+);
+// Definite article from gender. Handles elision before a vowel sound.
+const VOWELISH = /^[aeiouàâäéèêëîïôöùûüÿh]/i;
+function articleFor(w) {
+  if (!w || w.g == null) return ""; // not a noun
+  if (VOWELISH.test(w.fr)) return "l'";
+  return w.g === "f" ? "la " : "le ";
+}
+// The word as it should be spoken/shown WITH its article (nouns only).
+const withArticle = (w) => (w.g == null ? w.fr : articleFor(w) + w.fr);
+
+// ============================================================
+//  SPACED REPETITION ENGINE  (active recall + expanding intervals)
+//  Each card's memory state lives in progress.srs[wordId]:
+//    { ease, interval (days), due (dayIdx), reps, lapses }
+//  A Leitner/SM-2-lite scheme: rating the recall (again/hard/good/easy)
+//  moves the card to a longer or shorter interval. Due cards surface
+//  first; new cards fill the rest of the session.
+// ============================================================
+const SRS_RATINGS = { again: 0, hard: 1, good: 2, easy: 3 };
+function scheduleCard(card, rating, today) {
+  // card: existing srs state or undefined (new card)
+  const c = card || { ease: 2.3, interval: 0, due: today, reps: 0, lapses: 0 };
+  let { ease, interval, reps, lapses } = c;
+  if (rating === 0) {            // again — reset, see again today
+    lapses += 1; interval = 0; ease = Math.max(1.3, ease - 0.2);
+  } else {
+    reps += 1;
+    if (rating === 1) { ease = Math.max(1.3, ease - 0.15); interval = interval === 0 ? 1 : Math.max(1, Math.round(interval * 1.2)); }
+    else if (rating === 2) { interval = interval === 0 ? 1 : Math.round(interval * ease); }
+    else { ease = ease + 0.15; interval = interval === 0 ? 2 : Math.round(interval * ease * 1.3); }
+  }
+  interval = Math.min(interval, 365);
+  return { ease, interval, due: today + interval, reps, lapses };
+}
+// Pick the cards for a review session of size n.
+function dueCards(srs, today, n) {
+  const due = [], fresh = [];
+  VOCAB_FLAT.forEach((w) => {
+    const st = srs[w.id];
+    if (!st) fresh.push(w);
+    else if (st.due <= today) due.push({ w, due: st.due });
+  });
+  due.sort((a, b) => a.due - b.due);
+  const out = due.map((x) => x.w);
+  for (const w of fresh) { if (out.length >= n) break; out.push(w); }
+  return out.slice(0, n);
+}
+// How many cards are due right now (for badges).
+function countDue(srs, today) {
+  let n = 0;
+  VOCAB_FLAT.forEach((w) => { const st = srs[w.id]; if (!st || st.due <= today) n++; });
+  return n;
+}
+// Words the learner has started (for the library "known" count).
+const knownCount = (srs) => Object.keys(srs || {}).length;
 
 // daily phrase pool (intermediate, real sentences)
 const DAILY = [
@@ -273,15 +638,111 @@ const DAILY = [
   { fr: "Vouloir, c'est pouvoir.", en: "Where there's a will, there's a way." },
 ];
 
+// ---------- REFERENCE: GRAMMAR LIBRARY ----------
+// Browsable grammar notes, organized by level. Original explanations.
+const GRAMMAR = {
+  Beginner: [
+    { t: "Tu vs. Vous", b: "Two words for “you.” Use tu with friends, family, children and anyone you're close to. Use vous for strangers, elders, officials, and always for a group of people. When unsure with one person, vous is the polite, safe choice." },
+    { t: "Definite articles (le, la, les)", b: "“The” changes with gender and number: le (masculine), la (feminine), l' (before a vowel sound), les (plural). le livre, la table, l'ami, les enfants. Every noun has a gender you must learn with the word." },
+    { t: "Indefinite articles (un, une, des)", b: "“A / some”: un (masculine), une (feminine), des (plural). un chat, une maison, des amis. After a negative, they usually become de: Je n'ai pas de chat." },
+    { t: "Forming the negative (ne … pas)", b: "Wrap the verb in ne … pas: Je ne parle pas. In speech the ne is often dropped (Je parle pas), but write it in full. Before a vowel, ne becomes n': Je n'aime pas." },
+    { t: "Subject pronouns", b: "je (I), tu (you), il/elle/on (he/she/one-we), nous (we), vous (you formal/plural), ils/elles (they). on is used constantly in speech to mean “we”: On y va = Let's go." },
+    { t: "Forming plurals", b: "Most nouns add -s (which is silent): un livre → des livres. Words ending in -s, -x, -z don't change. Words in -eau/-eu add -x: un gâteau → des gâteaux. The article (les, des) is what you actually hear." },
+    { t: "Elision (l', d', j', n')", b: "When a short word ending in a vowel meets a word starting with a vowel sound, the vowel drops and an apostrophe joins them: le + ami → l'ami, je + ai → j'ai, ne + a → n'a, de + eau → d'eau." },
+    { t: "Adjective agreement", b: "Adjectives match the noun in gender and number. Add -e for feminine, -s for plural: un petit chat → une petite maison → des petits chats. Most descriptive adjectives go after the noun." },
+  ],
+  Intermediate: [
+    { t: "Passé composé", b: "The everyday past tense: avoir or être (present) + past participle. J'ai mangé (I ate). Verbs of movement/change of state use être and the participle agrees: Elle est allée (She went). Most other verbs use avoir." },
+    { t: "Imparfait", b: "The “background” past — habits, descriptions, ongoing states. Take the nous form of the present, drop -ons, add -ais, -ais, -ait, -ions, -iez, -aient. Je parlais = I used to speak / I was speaking. Pairs with passé composé for storytelling." },
+    { t: "Futur simple", b: "Add endings to the infinitive: -ai, -as, -a, -ons, -ez, -ont. parler → je parlerai. Irregular stems to memorise: être→ser-, avoir→aur-, aller→ir-, faire→fer-, pouvoir→pourr-." },
+    { t: "Partitive (du, de la, des)", b: "“Some/any” of an uncountable thing: du pain, de la confiture, de l'eau, des frites. After a negative or a quantity, all become de: pas de pain, beaucoup de pain." },
+    { t: "Reflexive verbs", b: "The action returns to the subject, marked by se: se laver (to wash oneself). Je me lave, tu te laves, il se lave. Very common for daily routine: se lever, se coucher, s'habiller." },
+    { t: "Comparatives", b: "plus … que (more than), moins … que (less than), aussi … que (as … as): Il est plus grand que moi. Irregular: bon → meilleur (better), bien → mieux (better, for actions)." },
+  ],
+  Advanced: [
+    { t: "Subjunctive (le subjonctif)", b: "Used after expressions of necessity, wish, emotion and doubt, almost always after que. Il faut que tu sois là (You must be there). Forms: take the ils-stem + -e, -es, -e, -ions, -iez, -ent. Key irregulars: faire→fasse, être→sois, avoir→aie, aller→aille, pouvoir→puisse." },
+    { t: "Conditional & si-clauses", b: "Hypotheticals pair tenses: Si + imparfait → conditionnel. Si j'avais le temps, je voyagerais. The conditional uses the future stem + imparfait endings. Also used for politeness: Je voudrais…, Pourriez-vous…?" },
+    { t: "Relative pronouns (qui, que, dont, où)", b: "Link clauses: qui = subject (l'homme qui parle), que = object (le livre que je lis), dont = of which/whose (le film dont je parle), où = where/when (le jour où…)." },
+    { t: "Passé simple", b: "The literary past, found in novels and history — never in speech. -ER verbs: il parla, ils parlèrent. You only need to recognise it; use passé composé when you speak or write normally." },
+    { t: "En and y", b: "en replaces de + thing (J'en veux = I want some); y replaces à + place/thing (J'y vais = I'm going there). They sit right before the verb." },
+  ],
+};
+
+// ---------- REFERENCE: PRONUNCIATION GUIDE ----------
+// Original IPA reference tables in the app's own format.
+const PRONUNCIATION = {
+  intro: "French spelling and sound don't map one-to-one. A letter's sound depends on its accents, the letters around it, and whether the syllable is open (ends in a vowel) or closed. Here are the core sounds with the IPA symbols used throughout the lessons.",
+  vowels: [
+    { ipa: "i", like: "ee in “meet”", ex: "vie, île, lycée" },
+    { ipa: "e", like: "ay in “say”", ex: "café, aimer, été" },
+    { ipa: "ɛ", like: "e in “bed”", ex: "forêt, crème, mère" },
+    { ipa: "a", like: "a in “cat”", ex: "ami, chat, la" },
+    { ipa: "ɑ", like: "a in “father”", ex: "pâte, pas" },
+    { ipa: "ə", like: "the “uh” in silent e", ex: "petit, le, demain" },
+    { ipa: "ɔ", like: "o in “fort”", ex: "fort, pomme, sortir" },
+    { ipa: "o", like: "o in “boat”", ex: "auto, beau, tôt" },
+    { ipa: "u", like: "oo in “moon”", ex: "nous, où, tout" },
+    { ipa: "y", like: "no English match — round lips for “ee”", ex: "sûr, salut, tu" },
+    { ipa: "ø", like: "rounded “uh”", ex: "deux, heureux" },
+    { ipa: "œ", like: "u in “further”", ex: "sœur, leur, heure" },
+  ],
+  nasals: [
+    { ipa: "ɛ̃", like: "nasal “an” (bien)", ex: "bien, main, pain, vin" },
+    { ipa: "ɑ̃", like: "nasal “on” (chance)", ex: "chance, tante, temps, dans" },
+    { ipa: "ɔ̃", like: "nasal “own” (bon)", ex: "bon, nom, monde, non" },
+    { ipa: "œ̃", like: "nasal “un” (brun)", ex: "un, brun, parfum" },
+  ],
+  consonants: [
+    { ipa: "ʁ", like: "the guttural French R, from the throat", ex: "rouge, Paris, mer" },
+    { ipa: "ʃ", like: "sh in “shoe”", ex: "chat, chien, chaud" },
+    { ipa: "ʒ", like: "s in “measure”", ex: "je, jour, rouge" },
+    { ipa: "ɲ", like: "ny in “canyon”", ex: "montagne, ligne" },
+    { ipa: "j", like: "y in “yes”", ex: "yeux, fille, travail" },
+    { ipa: "ɥ", like: "a quick “ü+ee” glide", ex: "lui, huit, nuit" },
+    { ipa: "w", like: "w in “wet”", ex: "oui, moi, week-end" },
+  ],
+  tips: [
+    "Final consonants are usually silent: petit sounds like “puh-tee,” grand like “grahn.” Exceptions cluster around the letters in the word CaReFuL (c, r, f, l), which often are pronounced.",
+    "Liaison: a normally-silent final consonant links onto a following vowel — les amis sounds like “lay-zah-mee.”",
+    "The letter h is always silent, but “aspirated h” words block liaison and elision (le héros, not l'héros).",
+    "Accents change sound: é = [e] (say), è/ê = [ɛ] (bed). The circumflex often marks a lost old “s” (forêt ≈ forest).",
+  ],
+};
+
+
+
 // ---------- HELPERS ----------
-const norm = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9' ]/g, "").replace(/\s+/g, " ").trim();
+// Live settings mirror — the App keeps this in sync with the current user's
+// settings so module-level helpers (norm, speak) can read them.
+const LIVE = { audioSpeed: "normal", strictAccents: false, autoAdvance: false, voiceURI: null, pitch: 1 };
+
+// Loose check: ignore accents/punctuation/case. Used when strictAccents is off.
+const normLoose = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9' ]/g, "").replace(/\s+/g, " ").trim();
+// Strict check: keep accents, still ignore case/punctuation.
+const normStrict = (s) => (s || "").toLowerCase().replace(/[^a-zà-ÿ0-9' ]/gi, "").replace(/\s+/g, " ").trim();
+const norm = (s) => (LIVE.strictAccents ? normStrict(s) : normLoose(s));
 const dayIdx = () => Math.floor((Date.now() - new Date(2024, 0, 1)) / 864e5);
 const shuffle = (a) => [...a].sort(() => Math.random() - 0.5);
+
+// Return the French voices the user's device offers (France + other regions).
+function frenchVoices() {
+  try {
+    const all = speechSynthesis.getVoices() || [];
+    return all.filter((v) => /^fr(-|_|$)/i.test(v.lang) || /fr-/i.test(v.lang));
+  } catch (e) { return []; }
+}
 
 function speak(text) {
   try {
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "fr-FR"; u.rate = 0.88;
+    u.lang = "fr-FR";
+    u.rate = LIVE.audioSpeed === "slow" ? 0.6 : LIVE.audioSpeed === "fast" ? 1.05 : 0.88;
+    u.pitch = LIVE.pitch || 1;
+    // pick the chosen voice if it's still available
+    if (LIVE.voiceURI) {
+      const v = frenchVoices().find((x) => x.voiceURI === LIVE.voiceURI);
+      if (v) u.voice = v;
+    }
     speechSynthesis.cancel(); speechSynthesis.speak(u);
   } catch (e) {}
 }
@@ -324,7 +785,10 @@ function Exercise({ item, onResult }) {
     else { settle(norm(val) === norm(item.a)); }
   };
 
-  const tag = { flashcard: "Learn", translate: "Translate", choice: "Choose", build: "Word order", listen: "Listening", conjugate: "Conjugate" }[item.k];
+  const tag = { flashcard: "Learn", translate: "Translate", choice: "Choose", build: "Word order", listen: "Listening", conjugate: "Conjugate", cloze: "Fill the blank" }[item.k];
+
+  // cloze: split the sentence on the ___ marker so we can drop an input inline
+  const clozeParts = item.k === "cloze" ? item.q.split("___") : null;
 
   return (
     <div className="ex">
@@ -338,6 +802,19 @@ function Exercise({ item, onResult }) {
           <button className="replay" onClick={() => speak(item.a)}>
             <Speaker text={item.a} big /> Replay audio
           </button>
+        </div>
+      ) : item.k === "cloze" ? (
+        <div className="cloze-wrap">
+          <p className="cloze-hint">Fill in the blank{item.note ? ` · ${item.note}` : ""}</p>
+          <div className="cloze-sentence">
+            <span>{clozeParts[0]}</span>
+            <input ref={inp} className={`cloze-blank ${status}`} value={val}
+              placeholder="…" disabled={status !== "idle"}
+              onChange={(e) => setVal(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && submit()} />
+            <span>{clozeParts[1]}</span>
+          </div>
+          {item.en && <p className="cloze-en">“{item.en}”</p>}
         </div>
       ) : (
         <h3 className="ex-q">{item.q}{item.subj && <em> · subject: {item.subj}</em>}</h3>
@@ -395,7 +872,7 @@ function Exercise({ item, onResult }) {
 }
 
 // ---------- UNIT (lesson flow) ----------
-function Unit({ unit, onBack, onComplete, awardXP }) {
+function Unit({ unit, onBack, onComplete, awardXP, onAnswered, autoAdvance }) {
   const [stage, setStage] = useState("study"); // study | drill | done
   const [vi, setVi] = useState(0);
   const [reveal, setReveal] = useState(false);
@@ -412,6 +889,8 @@ function Unit({ unit, onBack, onComplete, awardXP }) {
   const handleResult = (ok) => {
     if (ok) { setCorrect((c) => c + 1); setStreak((s) => s + 1); awardXP(10 + Math.min(streak, 5) * 2); }
     else setStreak(0);
+    onAnswered && onAnswered();
+    if (ok && autoAdvance) setTimeout(() => advanceEx(), 750);
   };
 
   const advanceEx = () => {
@@ -421,7 +900,7 @@ function Unit({ unit, onBack, onComplete, awardXP }) {
 
   return (
     <div className="unit">
-      <button className="back" onClick={onBack}>← Le parcours</button>
+      <button className="back" onClick={onBack}>← All lessons</button>
       <div className="unit-banner">
         <span className="lvtag">{unit.level}</span>
         <h2>{unit.title}</h2>
@@ -488,16 +967,22 @@ function Unit({ unit, onBack, onComplete, awardXP }) {
 }
 
 // ---------- CHALLENGE MODE ----------
-function Challenge({ onExit, awardXP }) {
+function Challenge({ onExit, awardXP, onFinish, onAnswered }) {
   const pool = useMemo(() => shuffle(allUnits.flatMap((u) => u.ex.filter((e) => e.k !== "flashcard"))).slice(0, 12), []);
   const [i, setI] = useState(0);
   const [lives, setLives] = useState(3);
   const [score, setScore] = useState(0);
   const [over, setOver] = useState(false);
+  const [recorded, setRecorded] = useState(false);
+
+  useEffect(() => {
+    if (over && !recorded) { onFinish && onFinish(score); setRecorded(true); }
+  }, [over, recorded, score, onFinish]);
 
   const onResult = (ok) => {
     if (ok) { setScore((s) => s + 1); awardXP(15); }
     else { setLives((l) => l - 1); }
+    onAnswered && onAnswered();
   };
   const next = () => {
     if (lives <= 0) return;
@@ -554,134 +1039,385 @@ function Daily({ onExit, awardXP, claimed, claim }) {
   );
 }
 
-// ---------- APP ----------
-function App() {
-  const [route, setRoute] = useState({ name: "home" });
-  const [xp, setXp] = useState(0);
-  const [scores, setScores] = useState({}); // unitId -> best %
-  const [dailyClaimed, setDailyClaimed] = useState(false);
-  const [openLevel, setOpenLevel] = useState("A1");
-
-  const awardXP = useCallback((n) => setXp((x) => x + n), []);
-  const completeUnit = (id, score) => setScores((s) => ({ ...s, [id]: Math.max(s[id] || 0, score) }));
-
-  const totalUnits = allUnits.length;
-  const doneUnits = Object.keys(scores).length;
-  const level = Math.floor(xp / 150) + 1;
-  const levelProg = Math.round(((xp % 150) / 150) * 100);
-  const rankName = ["Débutant", "Apprenti", "Voyageur", "Causeur", "Éloquent", "Maître"][Math.min(level - 1, 5)];
-
-  const goUnit = (u) => setRoute({ name: "unit", unit: u });
-
+// ---------- DAILY GOAL + STREAK CALENDAR (home widget) ----------
+const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+function DailyGoalCard({ progress, onChangeGoal, onPractise }) {
+  const today = dayIdx();
+  const count = progress.todayDay === today ? (progress.todayCount || 0) : 0;
+  const goal = progress.dailyGoal || 20;
+  const pct = Math.min(100, Math.round((count / goal) * 100));
+  // Build the current week (Sun..Sat) around today
+  const todayDate = new Date();
+  const dow = todayDate.getDay(); // 0=Sun
+  const week = DAY_LABELS.map((lab, i) => {
+    const offset = i - dow;            // days from today
+    const dIdx = today + offset;
+    const done = (progress.history && progress.history[dIdx]) || (dIdx === today ? count : 0);
+    const goalHit = done >= goal;
+    return { lab, dIdx, done, goalHit, isToday: offset === 0, future: offset > 0 };
+  });
+  const goalOptions = [10, 20, 30, 40];
+  const hit = count >= goal;
   return (
-    <div className="root">
-      <style>{CSS}</style>
-      <div className="grain" />
-
-      <header className="top">
-        <div className="logo" onClick={() => setRoute({ name: "home" })}>
-          <span className="mark">L</span>
-          <div><strong>Le Parcours</strong><em>Français · A1 → C1</em></div>
+    <section className="goal-card">
+      <div className="goal-top">
+        <div>
+          <p className="goal-kicker">Today's goal {hit ? "· done! 🎉" : ""}</p>
+          <p className="goal-count"><b>{count}</b> / {goal} answers today</p>
         </div>
-        <div className="meta">
-          <div className="rank"><span>{rankName}</span><small>Niveau {level}</small></div>
-          <div className="xp-ring" style={{ "--p": levelProg }}><b>{xp}</b><small>XP</small></div>
+        <div className="goal-ring" style={{ "--p": pct }}>
+          <span>{pct}%</span>
         </div>
-      </header>
-
-      {route.name === "home" && (
-        <main className="home">
-          <section className="hero">
-            <p className="eyebrow">Apprendre le français · du premier mot à la maîtrise</p>
-            <h1>Learn French properly — <span>from your first <em>bonjour</em> to fluent nuance.</span></h1>
-            <p className="lede">A structured path through five CEFR levels. Study real grammar, drill with six exercise types, then test your reflexes in challenge mode.</p>
-            <div className="hero-row">
-              <button className="cta" onClick={() => setRoute({ name: "challenge" })}>⚔ Challenge mode</button>
-              <button className="cta outline" onClick={() => setRoute({ name: "daily" })}>
-                {dailyClaimed ? "Today's expression" : "Expression du jour"}
-              </button>
-            </div>
-            <div className="hero-prog">
-              <div className="hp-bar"><div style={{ width: `${(doneUnits / totalUnits) * 100}%` }} /></div>
-              <span>{doneUnits} / {totalUnits} units mastered</span>
-            </div>
-          </section>
-
-          <div className="levels">
-            {CURRICULUM.map((lv) => {
-              const lvDone = lv.units.filter((u) => scores[u.id] != null).length;
-              const isOpen = openLevel === lv.level;
-              return (
-                <section key={lv.level} className={`lvl ${isOpen ? "open" : ""}`}>
-                  <button className="lvl-head" onClick={() => setOpenLevel(isOpen ? "" : lv.level)}>
-                    <span className="badge">{lv.level}</span>
-                    <div className="lvl-meta">
-                      <h2>{lv.name}</h2>
-                      <p>{lv.sub} — {lv.desc}</p>
-                    </div>
-                    <div className="lvl-side">
-                      <span className="lvl-frac">{lvDone}/{lv.units.length}</span>
-                      <span className="chev">{isOpen ? "−" : "+"}</span>
-                    </div>
-                  </button>
-                  {isOpen && (
-                    <div className="units">
-                      {lv.units.map((u, n) => {
-                        const sc = scores[u.id];
-                        return (
-                          <button key={u.id} className="unit-card" style={{ animationDelay: `${n * 60}ms` }}
-                            onClick={() => goUnit({ ...u, level: lv.level })}>
-                            <div className="uc-head">
-                              <h3>{u.title}</h3>
-                              {sc != null && <span className={`uc-score ${sc === 100 ? "perfect" : ""}`}>{sc}%</span>}
-                            </div>
-                            <p className="uc-focus">{u.focus}</p>
-                            <div className="uc-foot">
-                              <span>{u.vocab.length} words · {u.ex.length} drills</span>
-                              <span className="uc-go">Open →</span>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </section>
-              );
-            })}
+      </div>
+      <div className="goal-week">
+        {week.map((d) => (
+          <div key={d.lab} className={`gd ${d.goalHit ? "hit" : ""} ${d.isToday ? "today" : ""} ${d.future ? "future" : ""}`}>
+            <div className="gd-box">{d.goalHit ? "✓" : d.done > 0 ? "·" : ""}</div>
+            <span>{d.lab}</span>
           </div>
-        </main>
-      )}
+        ))}
+      </div>
+      <div className="goal-set">
+        <span>Daily target:</span>
+        {goalOptions.map((g) => (
+          <button key={g} className={`goal-opt ${goal === g ? "on" : ""}`} onClick={() => onChangeGoal(g)}>{g}</button>
+        ))}
+      </div>
+      <button className="goal-go" onClick={onPractise}>{hit ? "Keep practising →" : "Practise now →"}</button>
+    </section>
+  );
+}
 
-      {route.name === "unit" && (
-        <main className="page">
-          <Unit unit={route.unit} onBack={() => setRoute({ name: "home" })} onComplete={completeUnit} awardXP={awardXP} />
-        </main>
-      )}
-      {route.name === "challenge" && (
-        <main className="page"><Challenge onExit={() => setRoute({ name: "home" })} awardXP={awardXP} /></main>
-      )}
-      {route.name === "daily" && (
-        <main className="page"><Daily onExit={() => setRoute({ name: "home" })} awardXP={awardXP} claimed={dailyClaimed} claim={() => setDailyClaimed(true)} /></main>
-      )}
-
-      <footer className="bottom">Le Parcours · built for serious, joyful study · <em>bon courage</em></footer>
+// ---------- GRAMMAR LIBRARY ----------
+function GrammarLibrary({ onExit }) {
+  const levels = Object.keys(GRAMMAR);
+  const [tab, setTab] = useState(levels[0]);
+  const [open, setOpen] = useState(null);
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Home</button>
+      <div className="unit-banner">
+        <span className="lvtag">Reference</span>
+        <h2>Grammar library</h2>
+        <p>Browsable notes — tap any topic to expand.</p>
+      </div>
+      <div className="ref-tabs">
+        {levels.map((l) => (
+          <button key={l} className={`ref-tab ${tab === l ? "on" : ""}`} onClick={() => { setTab(l); setOpen(null); }}>{l}</button>
+        ))}
+      </div>
+      <div className="ref-list">
+        {GRAMMAR[tab].map((g, i) => (
+          <div key={i} className={`ref-item ${open === i ? "open" : ""}`}>
+            <button className="ref-q" onClick={() => setOpen(open === i ? null : i)}>
+              <span>{g.t}</span><span className="ref-chev">{open === i ? "−" : "+"}</span>
+            </button>
+            {open === i && <p className="ref-a">{g.b}</p>}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
+
+// ---------- PRONUNCIATION GUIDE ----------
+function PronunciationGuide({ onExit }) {
+  const P = PRONUNCIATION;
+  const Row = ({ s }) => (
+    <div className="pr-row">
+      <button className="pr-ipa" onClick={() => speak(s.ex.split(",")[0])} title="Hear an example">/{s.ipa}/</button>
+      <span className="pr-like">{s.like}</span>
+      <span className="pr-ex">{s.ex}</span>
+    </div>
+  );
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Home</button>
+      <div className="unit-banner">
+        <span className="lvtag">Reference</span>
+        <h2>Pronunciation guide</h2>
+        <p>{P.intro}</p>
+      </div>
+      <h4 className="pr-head">Vowels</h4>
+      <div className="pr-table">{P.vowels.map((s, i) => <Row key={i} s={s} />)}</div>
+      <h4 className="pr-head">Nasal vowels</h4>
+      <div className="pr-table">{P.nasals.map((s, i) => <Row key={i} s={s} />)}</div>
+      <h4 className="pr-head">Tricky consonants</h4>
+      <div className="pr-table">{P.consonants.map((s, i) => <Row key={i} s={s} />)}</div>
+      <h4 className="pr-head">Good to know</h4>
+      <ul className="pr-tips">{P.tips.map((t, i) => <li key={i}>{t}</li>)}</ul>
+      <p className="pr-fine">Tap any /symbol/ to hear an example word spoken.</p>
+    </div>
+  );
+}
+
+// ---------- SETTINGS ----------
+function Settings({ progress, onChange, onExit }) {
+  const s = progress.settings || {};
+  const [voices, setVoices] = useState(() => frenchVoices());
+
+  // voices load asynchronously in many browsers — listen for them
+  useEffect(() => {
+    const load = () => setVoices(frenchVoices());
+    load();
+    try { speechSynthesis.addEventListener("voiceschanged", load); } catch (e) {}
+    const t = setTimeout(load, 400); // fallback for engines that don't fire the event
+    return () => { try { speechSynthesis.removeEventListener("voiceschanged", load); } catch (e) {} clearTimeout(t); };
+  }, []);
+
+  const Toggle = ({ on, set }) => (
+    <button className={`toggle ${on ? "on" : ""}`} onClick={() => set(!on)} role="switch" aria-checked={on}>
+      <span className="knob" />
+    </button>
+  );
+
+  // Friendly, non-technical labels. Device voice names are cryptic, so we show
+  // "Voice 1, Voice 2…" with the region as a subtitle.
+  const regionOf = (v) => /ca/i.test(v.lang) ? "Canadian French" : /ch/i.test(v.lang) ? "Swiss French" : /be/i.test(v.lang) ? "Belgian French" : "French (France)";
+
+  // play a sample WITHOUT changing the saved choice
+  const sample = (voiceURI) => {
+    const prevURI = LIVE.voiceURI, prevPitch = LIVE.pitch;
+    LIVE.voiceURI = voiceURI; LIVE.pitch = s.pitch || 1;
+    speak("Bonjour ! Voici ma voix.");
+    // restore live state to the saved selection after sampling
+    LIVE.voiceURI = s.voiceURI || null; LIVE.pitch = prevPitch;
+  };
+  const choose = (voiceURI) => { onChange({ ...s, voiceURI }); LIVE.voiceURI = voiceURI; speak("Bonjour ! Voici ma voix."); };
+
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Home</button>
+      <div className="unit-banner">
+        <span className="lvtag">Preferences</span>
+        <h2>Settings</h2>
+      </div>
+      <div className="set-list">
+        <div className="set-row col">
+          <div className="set-head"><b>Voice</b><span>Pick the voice you like. Tap <b>Hear</b> to listen, then <b>Use</b> to keep it.</span></div>
+          {voices.length === 0 ? (
+            <p className="voice-empty">Your device will use its built-in French voice. To add more voices, install extra French text-to-speech voices in your device's system settings.</p>
+          ) : (
+            <div className="voice-list">
+              {/* default option */}
+              <div className={`voice-row ${!s.voiceURI ? "on" : ""}`}>
+                <span className="voice-check">{!s.voiceURI ? "✓" : ""}</span>
+                <div className="voice-meta">
+                  <span className="voice-name">Default voice</span>
+                  <span className="voice-sub">Your device's standard French</span>
+                </div>
+                <button className="voice-hear" onClick={() => sample(null)}>▶ Hear</button>
+                {!s.voiceURI ? <span className="voice-using">In use</span>
+                  : <button className="voice-use" onClick={() => choose(null)}>Use</button>}
+              </div>
+              {voices.map((v, i) => {
+                const selected = s.voiceURI === v.voiceURI;
+                return (
+                  <div key={v.voiceURI} className={`voice-row ${selected ? "on" : ""}`}>
+                    <span className="voice-check">{selected ? "✓" : ""}</span>
+                    <div className="voice-meta">
+                      <span className="voice-name">Voice {i + 1}</span>
+                      <span className="voice-sub">{regionOf(v)}</span>
+                    </div>
+                    <button className="voice-hear" onClick={() => sample(v.voiceURI)}>▶ Hear</button>
+                    {selected ? <span className="voice-using">In use</span>
+                      : <button className="voice-use" onClick={() => choose(v.voiceURI)}>Use</button>}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        <div className="set-row col">
+          <div className="set-head"><b>Voice pitch</b><span>Lower for a deeper voice, higher for a brighter one.</span></div>
+          <div className="seg">
+            {[["Low", 0.7], ["Normal", 1], ["High", 1.3]].map(([lab, p]) => (
+              <button key={lab} className={`seg-opt ${(s.pitch || 1) === p ? "on" : ""}`}
+                onClick={() => { onChange({ ...s, pitch: p }); LIVE.pitch = p; speak("Bonjour, comment ça va ?"); }}>{lab}</button>
+            ))}
+          </div>
+        </div>
+        <div className="set-row col">
+          <div className="set-head"><b>Audio speed</b><span>How fast spoken French plays.</span></div>
+          <div className="seg">
+            {["slow", "normal", "fast"].map((v) => (
+              <button key={v} className={`seg-opt ${(s.audioSpeed || "normal") === v ? "on" : ""}`}
+                onClick={() => onChange({ ...s, audioSpeed: v })}>{v[0].toUpperCase() + v.slice(1)}</button>
+            ))}
+          </div>
+        </div>
+        <div className="set-row">
+          <div className="set-head"><b>Strict accents</b><span>Require é, è, ç… exactly for a correct answer.</span></div>
+          <Toggle on={!!s.strictAccents} set={(v) => onChange({ ...s, strictAccents: v })} />
+        </div>
+        <div className="set-row">
+          <div className="set-head"><b>Auto-advance</b><span>Jump to the next question right after a correct answer.</span></div>
+          <Toggle on={!!s.autoAdvance} set={(v) => onChange({ ...s, autoAdvance: v })} />
+        </div>
+      </div>
+      <p className="set-fine">Settings are saved to your profile on this device. Available voices depend on your device and browser.</p>
+    </div>
+  );
+}
+
+// ---------- VOCABULARY LIBRARY (voiced flashcards) ----------
+function VocabLibrary({ progress, onExit, onStudied }) {
+  const themes = Object.keys(VOCAB);
+  const [theme, setTheme] = useState(themes[0]);
+  const words = useMemo(() => VOCAB[theme].map((w, i) => ({ ...w, theme, id: theme.toLowerCase().replace(/[^a-z]/g, "") + "-" + i })), [theme]);
+  const [i, setI] = useState(0);
+  const [flip, setFlip] = useState(false);
+  const w = words[i];
+  useEffect(() => { setI(0); setFlip(false); }, [theme]);
+  // speak the word WITH its article so learners hear the gender
+  const say = () => speak(withArticle(w));
+  useEffect(() => { setFlip(false); }, [i]);
+
+  const next = () => setI((p) => (p + 1) % words.length);
+  const prev = () => setI((p) => (p - 1 + words.length) % words.length);
+  const known = knownCount(progress.srs);
+
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Home</button>
+      <div className="unit-banner">
+        <span className="lvtag">Vocabulary</span>
+        <h2>Flashcard library</h2>
+        <p>{VOCAB_FLAT.length} words across {themes.length} themes · {known} in your review deck</p>
+      </div>
+      <div className="ref-tabs vocab-tabs">
+        {themes.map((t) => (
+          <button key={t} className={`ref-tab ${theme === t ? "on" : ""}`} onClick={() => setTheme(t)}>{t}</button>
+        ))}
+      </div>
+
+      <div className={`flashcard ${flip ? "flip" : ""}`} onClick={() => setFlip((f) => !f)}>
+        <div className="fc-inner">
+          <div className="fc-face fc-front">
+            {w.g && <span className={`fc-gender ${w.g}`}>{w.g === "f" ? "feminine" : "masculine"}</span>}
+            <h2 className="fc-word">{withArticle(w)}</h2>
+            <p className="fc-ipa">/{w.ipa}/</p>
+            <button className="fc-say" onClick={(e) => { e.stopPropagation(); say(); }}>🔊 Hear it</button>
+            <p className="fc-hint">Tap card to flip</p>
+          </div>
+          <div className="fc-face fc-back">
+            <h2 className="fc-en">{w.en}</h2>
+            {w.g && <p className="fc-art">article: <b>{articleFor(w).trim() || "l'"}</b> · {w.g === "f" ? "feminine" : "masculine"}</p>}
+            <p className="fc-hint">Tap to flip back</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="fc-nav">
+        <button className="ghost" onClick={prev}>← Prev</button>
+        <span className="counter">{i + 1} / {words.length}</span>
+        <button className="ghost" onClick={next}>Next →</button>
+      </div>
+      <p className="set-fine">Tip: hit <b>Review</b> on the home screen to practise these with spaced repetition.</p>
+    </div>
+  );
+}
+
+// ---------- SPACED-REPETITION REVIEW SESSION ----------
+// Active recall: see the English (or hear the French), try to recall, flip,
+// then rate yourself. The rating schedules when you'll see it next.
+function ReviewSession({ progress, onExit, onReview, onAnswered, goalCount, goalTarget }) {
+  const today = dayIdx();
+  const session = useMemo(() => dueCards(progress.srs || {}, today, Math.max(10, progress.dailyGoal || 20)), []);
+  const [i, setI] = useState(0);
+  const [flip, setFlip] = useState(false);
+  const [done, setDone] = useState(session.length === 0);
+  const [reviewed, setReviewed] = useState(0);
+  const w = session[i];
+
+  useEffect(() => { if (w) setTimeout(() => speak(withArticle(w)), 250); setFlip(false); }, [i]);
+
+  const rate = (ratingKey) => {
+    const rating = SRS_RATINGS[ratingKey];
+    onReview(w.id, rating);          // schedule the card
+    onAnswered && onAnswered();      // count toward today's goal
+    setReviewed((n) => n + 1);
+    if (i + 1 < session.length) setI(i + 1);
+    else setDone(true);
+  };
+
+  if (done) {
+    return (
+      <div className="unit">
+        <button className="back" onClick={onExit}>← Home</button>
+        <div className="result">
+          <div className="score-ring" style={{ "--p": 100 }}><span>{reviewed}</span></div>
+          <h2>{reviewed === 0 ? "All caught up! 🎉" : "Belle séance ! 👏"}</h2>
+          <p>{reviewed === 0
+            ? "No cards are due right now. Come back later, or browse the flashcard library to add new words."
+            : `You reviewed ${reviewed} word${reviewed > 1 ? "s" : ""}. They'll come back at just the right time to stick.`}</p>
+          <button className="cta sm" onClick={onExit}>Back to home</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Home</button>
+      <div className="unit-banner">
+        <span className="lvtag">Spaced repetition</span>
+        <h2>Review</h2>
+        <p>Recall it, flip, then rate how well you knew it.</p>
+      </div>
+      <div className="drill-top">
+        <div className="bar"><div className="bar-f" style={{ width: `${(i / session.length) * 100}%` }} /></div>
+        <span className="counter">{i + 1}/{session.length}</span>
+      </div>
+
+      <div className={`flashcard ${flip ? "flip" : ""}`} onClick={() => setFlip(true)}>
+        <div className="fc-inner">
+          <div className="fc-face fc-front">
+            <span className="fc-prompt">What does this mean?</span>
+            <h2 className="fc-word">{withArticle(w)}</h2>
+            <button className="fc-say" onClick={(e) => { e.stopPropagation(); speak(withArticle(w)); }}>🔊 Hear it</button>
+            {!flip && <p className="fc-hint">Think… then tap to reveal</p>}
+          </div>
+          <div className="fc-face fc-back">
+            <h2 className="fc-en">{w.en}</h2>
+            {w.g && <p className="fc-art">{articleFor(w).trim() || "l'"} · {w.g === "f" ? "feminine" : "masculine"}</p>}
+          </div>
+        </div>
+      </div>
+
+      {flip ? (
+        <div className="srs-rate">
+          <p className="srs-q">How well did you recall it?</p>
+          <div className="srs-btns">
+            <button className="srs-btn again" onClick={() => rate("again")}>Again</button>
+            <button className="srs-btn hard" onClick={() => rate("hard")}>Hard</button>
+            <button className="srs-btn good" onClick={() => rate("good")}>Good</button>
+            <button className="srs-btn easy" onClick={() => rate("easy")}>Easy</button>
+          </div>
+        </div>
+      ) : (
+        <button className="cta wide" onClick={() => setFlip(true)}>Reveal answer</button>
+      )}
+    </div>
+  );
+}
+
+
+
 
 // ---------- STYLES ----------
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Spline+Sans:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 .root{
-  --paper:#f4efe6; --ink:#1f1b16; --soft:#6b6258; --line:#e0d8c8;
-  --card:#fbf8f1; --rouge:#c1432b; --bleu:#2f4a7c; --or:#c79a3a; --vert:#3d6b53;
-  --shadow:0 18px 50px rgba(60,45,25,.10);
+  --paper:#fbf7f2; --ink:#211b22; --soft:#6f6675; --line:#ebe2da;
+  --card:#ffffff; --rouge:#e0533d; --bleu:#3b4cc0; --or:#e8a838; --vert:#2f9e74;
+  --shadow:0 18px 50px rgba(70,50,80,.10);
   font-family:'Spline Sans',system-ui,sans-serif; color:var(--ink);
   background:var(--paper); min-height:100vh; position:relative; overflow-x:hidden;
 }
-.grain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
-  background-image:radial-gradient(circle at 15% 20%,#efe6d2 0,transparent 45%),radial-gradient(circle at 85% 10%,#e7e9df 0,transparent 40%),radial-gradient(circle at 60% 95%,#f0e2d6 0,transparent 45%);}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.85;
+  background-image:radial-gradient(circle at 12% 16%,#ffe2d8 0,transparent 42%),radial-gradient(circle at 88% 8%,#dfe3ff 0,transparent 40%),radial-gradient(circle at 72% 96%,#d6f3e6 0,transparent 44%),radial-gradient(circle at 20% 90%,#fdeecb 0,transparent 40%);}
 h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:500;letter-spacing:-.01em}
 em{font-style:italic}
 button{font-family:inherit;cursor:pointer}
@@ -867,10 +1603,1270 @@ main{max-width:1000px;margin:0 auto;padding:30px 26px 50px;position:relative;z-i
   .hero h1{font-size:30px}.units{grid-template-columns:1fr}
   .lvl-head{padding:16px}.ex{padding:18px}.ex-q{font-size:19px}
 }
+
+/* ===== LANDING / AUTH ===== */
+.landing{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;padding:30px 20px;text-align:center}
+.land-inner{position:relative;z-index:1;max-width:520px;animation:rise .6s both}
+.land-mark{width:70px;height:70px;border-radius:20px;display:grid;place-items:center;margin:0 auto 22px;
+  background:var(--rouge);color:#fff;font-family:'Fraunces',serif;font-size:40px;box-shadow:0 12px 30px rgba(193,67,43,.35)}
+.eyebrow.center{text-align:center}
+.land-title{font-size:clamp(38px,7vw,60px);line-height:1.0;margin:6px 0 16px}
+.land-sub{color:var(--soft);font-size:17px;line-height:1.6;max-width:440px;margin:0 auto 30px}
+.land-actions{display:flex;flex-direction:column;gap:12px;max-width:340px;margin:0 auto}
+.land-fine{font-size:12px;color:var(--soft);margin-top:6px}
+.land-form{display:flex;flex-direction:column;gap:10px;max-width:380px;margin:0 auto;text-align:left}
+.land-form label{font-size:13px;font-weight:600;color:var(--soft);margin-top:4px}
+.land-form .field{margin-bottom:2px}
+.textback{background:none;border:none;color:var(--soft);font-size:13px;margin-top:4px;align-self:center}
+.land-foot{position:relative;z-index:1;margin-top:36px;color:var(--soft);font-size:13px}
+
+/* welcome feature chips */
+.land-feats{display:flex;gap:10px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+.lf{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:14px 16px;min-width:96px}
+.lf span{font-size:24px}
+.lf p{font-size:11px;color:var(--soft);text-align:center;line-height:1.3}
+
+/* registration form */
+.form-step{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--rouge);font-weight:700;margin-bottom:4px}
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-2col label{margin-top:0}
+.phone-row{display:flex;gap:8px}
+.cc-select{flex-shrink:0;max-width:140px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);font-family:inherit;
+  font-size:14px;padding:0 8px;outline:none;cursor:pointer;color:var(--ink);text-overflow:ellipsis}
+.cc-select:focus{border-color:var(--bleu)}
+.phone-row .field{flex:1;min-width:0;margin-bottom:0}
+.field.bad{border-color:var(--rouge);background:#fdeeec}
+.form-err{font-size:12px;color:var(--rouge);font-weight:600}
+
+/* avatar picker */
+.av-preview{font-size:64px;text-align:center;margin:4px 0 6px;height:74px;line-height:74px}
+.av-tabs{display:flex;gap:6px;background:var(--line);padding:4px;border-radius:11px}
+.av-tab{flex:1;border:none;background:none;padding:9px;border-radius:8px;font-family:inherit;font-weight:700;color:var(--soft);cursor:pointer;font-size:13px;transition:.13s}
+.av-tab.on{background:var(--card);color:var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.av-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:4px 0}
+.av-opt{aspect-ratio:1;border:1.5px solid var(--line);border-radius:12px;background:var(--card);font-size:26px;
+  display:grid;place-items:center;cursor:pointer;transition:.13s}
+.av-opt:hover{border-color:var(--ink);transform:translateY(-2px)}
+.av-opt.on{border-color:var(--vert);border-width:2.5px;background:#f0fbf6}
+.prof-avpick{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:16px;display:flex;flex-direction:column;gap:8px}
+.prof-av-edit{position:absolute;right:-2px;bottom:-2px;background:var(--ink);color:#fff;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px}
+.prof-phone{font-size:12px;color:var(--soft);margin-top:1px}
+
+/* ===== STREAK + AVATAR ===== */
+.streakchip{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 13px;font-weight:700;font-size:14px}
+.avatar-btn{background:none;border:none;padding:0}
+.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:24px;
+  background:var(--card);border:2px solid var(--line);transition:.15s}
+.avatar-btn:hover .avatar{border-color:var(--rouge);transform:scale(1.05)}
+
+/* ===== LOCKED LEVELS + STARS ===== */
+.lvl.locked{opacity:.85}
+.lvl.locked .lvl-head{cursor:not-allowed}
+.lvl.locked .badge{background:var(--line);color:var(--soft);font-size:20px}
+.lock-msg{font-size:13px;color:var(--rouge);font-weight:600;margin-top:3px}
+.lvl-code{font-family:'Spline Sans';font-size:12px;color:var(--soft);font-weight:600;letter-spacing:.06em}
+.lvl-stars{font-size:12px;color:var(--or);font-weight:700;white-space:nowrap}
+.uc-stars{display:flex;gap:3px;font-size:15px;color:var(--line)}
+.uc-stars span.on{color:var(--or)}
+.uc-stars.dim{opacity:.5}
+
+/* locked & taster unit cards */
+.unit-card.uclocked{opacity:.7}
+.unit-card.uclocked:hover{transform:none;border-color:var(--line)}
+.uc-lock{font-size:14px}
+.unit-card.uctaster{border-color:var(--vert);border-width:1.5px;background:linear-gradient(180deg,#f0fbf6,var(--paper))}
+.uc-taster{background:var(--vert);color:#fff;font-size:10px;font-weight:800;letter-spacing:.06em;padding:3px 9px;border-radius:99px}
+.unit-card.uclocked .uc-go{color:var(--or)}
+.unit-card.uctaster .uc-go{color:var(--vert);font-weight:700}
+
+/* ===== PULSE on daily ===== */
+.pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(199,154,58,.4)}50%{box-shadow:0 0 0 8px rgba(199,154,58,0)}}
+
+/* ===== HERO PROG TWEAK ===== */
+.hp-row{display:flex;justify-content:space-between;font-size:13px;color:var(--soft);margin-bottom:6px}
+.hp-units{display:block;margin-top:6px}
+
+/* ===== TOAST (unlock) ===== */
+.toast{position:fixed;top:80px;left:0;right:0;z-index:60;display:flex;justify-content:center;pointer-events:none;padding:0 16px}
+.toast-in{background:var(--ink);color:var(--paper);border-radius:14px;padding:16px 22px;display:flex;align-items:center;gap:14px;
+  box-shadow:0 18px 50px rgba(0,0,0,.3);animation:drop .5s cubic-bezier(.2,1.4,.4,1) both;max-width:420px}
+.toast-key{font-size:30px;animation:wiggle .6s ease 3}
+.toast-in strong{font-family:'Fraunces',serif;font-size:18px;display:block}
+.toast-in p{font-size:13px;opacity:.85;margin-top:2px}
+@keyframes drop{from{transform:translateY(-80px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-18deg)}75%{transform:rotate(18deg)}}
+
+/* ===== MODAL / PROFILE ===== */
+.modal-bg{position:fixed;inset:0;z-index:70;background:rgba(31,27,22,.45);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;padding:20px;animation:fade .2s both}
+.modal{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:30px;max-width:460px;width:100%;
+  position:relative;box-shadow:0 30px 80px rgba(0,0,0,.3);animation:rise .35s both}
+.modal-x{position:absolute;top:16px;right:18px;background:none;border:none;font-size:26px;color:var(--soft);line-height:1}
+.prof-head{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+.prof-av{position:relative;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:34px;background:var(--card);border:2px solid var(--line);cursor:pointer;transition:.15s}
+.prof-av:hover{border-color:var(--rouge)}
+.prof-head h2{font-size:24px}
+.prof-sub{color:var(--soft);font-size:13px;margin-top:2px}
+.prof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.prof-stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 8px;text-align:center}
+.prof-stat b{font-family:'Fraunces',serif;font-size:20px;display:block}
+.prof-stat span{font-size:11px;color:var(--soft)}
+.prof-best{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:14px;color:var(--soft);margin-bottom:18px}
+.prof-best b{color:var(--ink);font-family:'Fraunces',serif}
+.ghost.wide{width:100%}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+/* ===== PAYWALL / UPSELL ===== */
+.upsell{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left;
+  background:linear-gradient(110deg,#2b2620,#3a2f25);color:var(--paper);border:1px solid #4a3d30;
+  border-radius:16px;padding:18px 22px;margin-bottom:22px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.upsell:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(60,45,25,.25)}
+.upsell-l{display:flex;align-items:center;gap:14px}
+.upsell-badge{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;
+  background:linear-gradient(135deg,var(--or),var(--rouge));color:#fff;font-size:20px}
+.upsell-l strong{font-family:'Fraunces',serif;font-size:18px;display:block}
+.upsell-l p{font-size:13px;opacity:.8;margin-top:2px}
+.upsell-cta{background:var(--or);color:#1f1b16;font-weight:700;font-size:14px;padding:10px 16px;border-radius:10px;white-space:nowrap}
+
+.lvl.paylock .badge{background:linear-gradient(135deg,var(--or),var(--rouge));color:#fff;font-size:20px}
+.lvl.paylock .lvl-head{cursor:pointer}
+.pay-msg{font-size:13px;color:var(--or);font-weight:700;margin-top:3px}
+.pay-pill{background:var(--or);color:#1f1b16;font-weight:700;font-size:12px;padding:4px 11px;border-radius:99px;white-space:nowrap}
+
+.paywall{text-align:center}
+.pw-badge{display:inline-block;background:linear-gradient(135deg,var(--or),var(--rouge));color:#fff;font-weight:700;
+  font-size:13px;letter-spacing:.06em;padding:6px 16px;border-radius:99px;margin-bottom:14px}
+.pw-title{font-size:28px;margin-bottom:6px}
+.pw-price{font-size:15px;color:var(--soft);margin-bottom:18px}
+.pw-price b{font-family:'Fraunces',serif;font-size:40px;color:var(--ink);display:inline-block;margin-right:6px}
+.pw-list{list-style:none;text-align:left;margin:0 auto 22px;max-width:320px;display:flex;flex-direction:column;gap:10px}
+.pw-list li{padding-left:28px;position:relative;font-size:14px;color:var(--ink)}
+.pw-list li::before{content:"✓";position:absolute;left:0;top:0;color:var(--vert);font-weight:800}
+.buybtn{background:linear-gradient(135deg,var(--or),var(--rouge));border:none}
+.buybtn:hover{filter:brightness(1.06);background:linear-gradient(135deg,var(--or),var(--rouge))}
+.cta.wide{width:100%}
+.pw-done{background:#e7efe8;color:var(--vert);font-weight:700;border-radius:12px;padding:15px;font-size:16px;margin-bottom:8px}
+.pw-fine{font-size:11px;color:var(--soft);margin-top:12px}
+.prof-plan{border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;margin-bottom:14px;text-align:center;
+  background:var(--card);border:1px solid var(--line);color:var(--soft)}
+.prof-plan.pro{background:linear-gradient(135deg,#fbf2dd,#f6e3c8);border-color:var(--or);color:#8a6d22}
+
+/* ===== HEADER GEAR ===== */
+.gear-btn{background:var(--card);border:1px solid var(--line);color:var(--soft);border-radius:50%;width:40px;height:40px;display:grid;place-items:center;transition:.15s}
+.gear-btn:hover{border-color:var(--ink);color:var(--ink)}
+
+/* ===== DAILY GOAL CARD ===== */
+.goal-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:18px;box-shadow:var(--shadow)}
+.goal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.goal-kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);font-weight:700}
+.goal-count{font-size:18px;margin-top:3px}
+.goal-count b{font-family:'Fraunces',serif;font-size:26px}
+.goal-ring{--p:0;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;
+  background:conic-gradient(var(--vert) calc(var(--p)*1%),var(--line) 0);position:relative}
+.goal-ring::before{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--card)}
+.goal-ring span{position:relative;font-size:13px;font-weight:700}
+.goal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px}
+.gd{display:flex;flex-direction:column;align-items:center;gap:6px}
+.gd-box{width:100%;aspect-ratio:1;max-width:42px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);
+  display:grid;place-items:center;font-size:16px;color:var(--soft);font-weight:700}
+.gd.hit .gd-box{background:var(--vert);border-color:var(--vert);color:#fff}
+.gd.today .gd-box{border-color:var(--rouge);border-width:2px}
+.gd.future .gd-box{opacity:.45}
+.gd span{font-size:11px;color:var(--soft)}
+.goal-set{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.goal-set>span{font-size:13px;color:var(--soft)}
+.goal-opt{background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:5px 13px;font-size:13px;font-weight:700;color:var(--soft);transition:.13s}
+.goal-opt.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* ===== REFERENCE CARDS (home) ===== */
+.ref-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:26px}
+.ref-card{display:flex;align-items:center;gap:14px;text-align:left;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:16px 18px;transition:transform .15s,border-color .15s}
+.ref-card:hover{transform:translateY(-2px);border-color:var(--ink)}
+.ref-emoji{font-size:28px}
+.ref-card strong{font-family:'Fraunces',serif;font-size:16px;display:block}
+.ref-card p{font-size:12px;color:var(--soft);margin-top:2px}
+
+/* ===== GRAMMAR LIBRARY ===== */
+.ref-tabs{display:flex;gap:8px;background:var(--line);padding:5px;border-radius:14px;margin-bottom:20px;max-width:380px}
+.ref-tab{flex:1;border:none;background:none;padding:10px;border-radius:10px;font-family:inherit;font-weight:700;color:var(--soft);cursor:pointer;transition:.15s;font-size:14px}
+.ref-tab.on{background:var(--card);color:var(--ink);box-shadow:0 3px 8px rgba(0,0,0,.06)}
+.ref-list{display:flex;flex-direction:column;gap:10px}
+.ref-item{background:var(--card);border:1px solid var(--line);border-radius:13px;overflow:hidden;transition:box-shadow .2s}
+.ref-item.open{box-shadow:var(--shadow)}
+.ref-q{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;background:none;border:none;
+  padding:16px 18px;font-family:'Fraunces',serif;font-size:17px;color:var(--ink);text-align:left;cursor:pointer}
+.ref-chev{font-size:22px;color:var(--soft);width:20px;text-align:center;flex-shrink:0}
+.ref-a{padding:0 18px 18px;color:var(--soft);font-size:14px;line-height:1.65}
+
+/* ===== PRONUNCIATION GUIDE ===== */
+.pr-head{font-size:18px;margin:24px 0 12px}
+.pr-table{background:var(--card);border:1px solid var(--line);border-radius:13px;overflow:hidden}
+.pr-row{display:grid;grid-template-columns:64px 1fr 1.3fr;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.pr-row:last-child{border-bottom:none}
+.pr-ipa{font-family:'Spline Sans';font-size:16px;font-weight:700;color:var(--bleu);background:var(--paper);
+  border:1px solid var(--line);border-radius:8px;padding:6px 4px;cursor:pointer;transition:.13s}
+.pr-ipa:hover{background:var(--bleu);color:#fff;border-color:var(--bleu)}
+.pr-like{font-size:14px}
+.pr-ex{font-size:14px;color:var(--soft)}
+.pr-tips{list-style:none;display:flex;flex-direction:column;gap:12px;padding:0}
+.pr-tips li{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--or);border-radius:10px;
+  padding:14px 16px;font-size:14px;color:var(--soft);line-height:1.6}
+.pr-fine{text-align:center;color:var(--soft);font-size:12px;margin-top:16px}
+
+/* ===== SETTINGS ===== */
+.set-list{display:flex;flex-direction:column;gap:12px}
+.set-row{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px 18px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px}
+.set-row.col{flex-direction:column;align-items:stretch;gap:12px}
+.set-head b{font-family:'Fraunces',serif;font-size:16px;display:block}
+.set-head span{font-size:13px;color:var(--soft);margin-top:2px;display:block}
+.toggle{width:52px;height:30px;border-radius:99px;background:var(--line);border:none;position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+.toggle.on{background:var(--vert)}
+.toggle .knob{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
+.toggle.on .knob{left:25px}
+.seg{display:flex;gap:6px;background:var(--line);padding:4px;border-radius:11px}
+.seg-opt{flex:1;border:none;background:none;padding:9px;border-radius:8px;font-family:inherit;font-weight:700;color:var(--soft);cursor:pointer;font-size:13px;transition:.13s}
+.seg-opt.on{background:var(--card);color:var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.set-fine{text-align:center;color:var(--soft);font-size:12px;margin-top:16px}
+
+/* ===== GOAL CARD EXTRA ===== */
+.goal-go{width:100%;margin-top:14px;background:var(--ink);color:var(--paper);border:none;border-radius:11px;
+  padding:12px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;transition:.15s}
+.goal-go:hover{background:var(--rouge)}
+
+/* ===== REVIEW BANNER ===== */
+.review-banner{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left;
+  background:linear-gradient(110deg,var(--bleu),#5a6be0);color:#fff;border:none;border-radius:16px;
+  padding:18px 22px;margin-bottom:18px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.review-banner:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(59,76,192,.3)}
+.rev-l{display:flex;align-items:center;gap:14px}
+.rev-emoji{font-size:30px}
+.rev-l strong{font-family:'Fraunces',serif;font-size:18px;display:block}
+.rev-l p{font-size:13px;opacity:.9;margin-top:2px}
+.rev-badge{background:#fff;color:var(--bleu);font-weight:800;font-size:14px;padding:9px 15px;border-radius:10px;white-space:nowrap}
+
+.ref-cards-3{grid-template-columns:repeat(3,1fr)}
+
+/* ===== FLASHCARDS ===== */
+.vocab-tabs{flex-wrap:wrap;max-width:none}
+.flashcard{perspective:1200px;height:280px;margin:6px 0 18px;cursor:pointer}
+.fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flashcard.flip .fc-inner{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;border:1px solid var(--line);
+  background:var(--card);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center}
+.fc-back{transform:rotateY(180deg);background:linear-gradient(165deg,#f0fbf6,var(--card))}
+.fc-word{font-size:40px;line-height:1.1}
+.fc-en{font-size:32px;color:var(--vert)}
+.fc-ipa{color:var(--bleu);font-size:15px}
+.fc-gender{position:absolute;top:16px;right:16px;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  padding:4px 10px;border-radius:99px}
+.fc-gender.f{background:#fde7f0;color:#c2367a}
+.fc-gender.m{background:#e3eafc;color:#3b4cc0}
+.fc-prompt{position:absolute;top:16px;left:0;right:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);font-weight:700}
+.fc-say{background:var(--paper);border:1px solid var(--line);color:var(--rouge);font-weight:700;font-size:14px;padding:9px 16px;border-radius:10px;cursor:pointer;transition:.13s}
+.fc-say:hover{background:var(--rouge);color:#fff;border-color:var(--rouge)}
+.fc-hint{color:var(--soft);font-size:12px}
+.fc-art{font-size:14px;color:var(--soft)}
+.fc-art b{color:var(--ink);font-family:'Fraunces',serif}
+.fc-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+
+/* ===== SRS RATING ===== */
+.srs-rate{margin-top:4px}
+.srs-q{text-align:center;font-size:14px;color:var(--soft);font-weight:600;margin-bottom:10px}
+.srs-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.srs-btn{border:none;border-radius:11px;padding:14px 6px;font-family:inherit;font-weight:800;font-size:14px;color:#fff;cursor:pointer;transition:.13s}
+.srs-btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+.srs-btn.again{background:#d9534f}
+.srs-btn.hard{background:#e8a838}
+.srs-btn.good{background:var(--vert)}
+.srs-btn.easy{background:var(--bleu)}
+
+/* ===== VOICE PICKER (clear, two-action rows) ===== */
+.voice-list{display:flex;flex-direction:column;gap:8px}
+.voice-row{display:flex;align-items:center;gap:12px;background:var(--paper);border:1.5px solid var(--line);
+  border-radius:12px;padding:12px 14px}
+.voice-row.on{border-color:var(--vert);background:#f0fbf6}
+.voice-check{width:20px;flex-shrink:0;text-align:center;color:var(--vert);font-weight:800;font-size:16px}
+.voice-meta{flex:1;min-width:0}
+.voice-name{display:block;font-weight:700;font-size:15px}
+.voice-sub{display:block;font-size:12px;color:var(--soft)}
+.voice-hear{background:var(--card);border:1px solid var(--line);color:var(--bleu);font-weight:700;
+  font-size:13px;padding:8px 12px;border-radius:9px;white-space:nowrap;flex-shrink:0;transition:.13s}
+.voice-hear:hover{border-color:var(--bleu);background:var(--bleu);color:#fff}
+.voice-use{background:var(--ink);border:none;color:var(--paper);font-weight:700;font-size:13px;
+  padding:8px 16px;border-radius:9px;white-space:nowrap;flex-shrink:0;transition:.13s}
+.voice-use:hover{background:var(--vert)}
+.voice-using{color:var(--vert);font-weight:700;font-size:13px;white-space:nowrap;flex-shrink:0;padding:8px 4px}
+.voice-empty{font-size:13px;color:var(--soft);background:var(--paper);border:1px solid var(--line);
+  border-radius:10px;padding:14px 16px;line-height:1.6}
+
+/* ===== CLOZE EXERCISE ===== */
+.cloze-wrap{margin-bottom:18px}
+.cloze-hint{font-size:13px;color:var(--soft);font-weight:600;margin-bottom:12px}
+.cloze-sentence{font-family:'Fraunces',serif;font-size:24px;line-height:1.5;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.cloze-blank{font-family:'Spline Sans';font-size:18px;border:none;border-bottom:2px solid var(--bleu);background:var(--paper);
+  padding:4px 10px;min-width:90px;width:120px;text-align:center;outline:none;border-radius:6px 6px 0 0}
+.cloze-blank:focus{background:#eef2f8}
+.cloze-blank.right{border-color:var(--vert);background:#e7efe8}
+.cloze-blank.wrong{border-color:var(--rouge);background:#f8e9e6}
+.cloze-en{font-size:14px;color:var(--soft);font-style:italic;margin-top:12px}
+
+@media(max-width:600px){
+  .prof-grid{grid-template-columns:repeat(2,1fr)}
+  .land-title{font-size:40px}
+  .meta{gap:10px}.rank{display:none}
+  .upsell{flex-direction:column;align-items:flex-start;gap:12px}
+  .ref-cards{grid-template-columns:1fr}
+  .ref-cards-3{grid-template-columns:1fr}
+  .review-banner{flex-direction:column;align-items:flex-start;gap:12px}
+  .srs-btns{grid-template-columns:repeat(2,1fr)}
+  .pr-row{grid-template-columns:54px 1fr;row-gap:4px}
+  .pr-ex{grid-column:2}
+  .cloze-sentence{font-size:20px}
+}
 `;
 
-const container=document.getElementById("root");
-ReactDOM.createRoot(container).render(<App />);
+// ============================================================
+//  PERSISTENCE LAYER
+//  Uses localStorage. Wrapped so it never crashes if unavailable.
+// ============================================================
+const STORE_KEY = "frenchwithhalle_v1";
+const safeGet = () => {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || { users: {}, current: null }; }
+  catch (e) { return { users: {}, current: null }; }
+};
+const safeSet = (data) => {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {}
+};
+
+const blankProgress = () => ({
+  xp: 0,
+  scores: {},          // unitId -> best %
+  streak: 0,
+  lastDay: null,       // dayIdx of last activity
+  dailyClaimedDay: null,
+  bestChallenge: 0,
+  hasPaid: false,      // ← the single source of truth for the $5 unlock
+  dailyGoal: 20,       // target questions answered per day
+  todayCount: 0,       // questions answered today (resets on a new day)
+  todayDay: null,      // dayIdx that todayCount belongs to
+  history: {},         // dayIdx -> questions answered that day (for the calendar)
+  settings: { audioSpeed: "normal", strictAccents: false, autoAdvance: false, voiceURI: null, pitch: 1 },
+  srs: {},             // wordId -> spaced-repetition memory state
+  joined: Date.now(),
+});
+
+// ============================================================
+//  PROFILE AVATARS
+//  A curated set the user picks from, grouped female / male / neutral.
+//  (Uses expressive character emoji; renders consistently everywhere.)
+// ============================================================
+const AVATAR_SETS = {
+  female: ["👩", "👩‍🦰", "👩‍🦱", "👩‍🦳", "👱‍♀️", "👩‍🎓", "🧕", "👸", "🦸‍♀️", "👩‍🏫"],
+  male:   ["👨", "👨‍🦰", "👨‍🦱", "👨‍🦳", "👱‍♂️", "👨‍🎓", "🧔", "🤴", "🦸‍♂️", "👨‍🏫"],
+  other:  ["🧑", "🧑‍🎓", "🦊", "🦉", "🐱", "🐼", "🦄", "🐢"],
+};
+const ALL_AVATARS = [...AVATAR_SETS.female, ...AVATAR_SETS.male, ...AVATAR_SETS.other];
+// Fallback if a profile has no chosen avatar yet.
+const defaultAvatar = (name) => ALL_AVATARS[(name || "").split("").reduce((a, c) => a + c.charCodeAt(0), 0) % ALL_AVATARS.length];
+// What to actually display for a user.
+const avatarOf = (user) => (user && user.avatar) || defaultAvatar(user && user.name);
+
+// ============================================================
+//  AUTH / REGISTRATION
+//  Profiles are keyed by email (unique per user). In production this
+//  becomes a real account on your backend; the shape stays the same.
+// ============================================================
+function registerUser({ firstName, lastName, email, phone, avatar }) {
+  const data = safeGet();
+  const key = "user:" + email.trim().toLowerCase();
+  const name = (firstName.trim() + " " + lastName.trim()).trim();
+  if (!data.users[key]) {
+    data.users[key] = {
+      firstName: firstName.trim(), lastName: lastName.trim(), name,
+      email: email.trim(), phone: (phone || "").trim(),
+      avatar: avatar || defaultAvatar(name), provider: "local",
+      progress: blankProgress(),
+    };
+  } else {
+    // returning user — update details in case they changed
+    const u = data.users[key];
+    u.firstName = firstName.trim(); u.lastName = lastName.trim(); u.name = name;
+    u.phone = (phone || "").trim(); if (avatar) u.avatar = avatar;
+  }
+  data.current = key;
+  safeSet(data);
+  return key;
+}
+
+// update the current user's avatar
+function setUserAvatar(userKey, avatar) {
+  const data = safeGet();
+  if (data.users[userKey]) { data.users[userKey].avatar = avatar; safeSet(data); }
+}
+
+function signOut() {
+  const data = safeGet();
+  data.current = null;
+  safeSet(data);
+}
+
+// ============================================================
+//  PAYMENT / ENTITLEMENT  (the $5 one-time unlock)
+//  ----------------------------------------------------------
+//  FREE_LEVELS are open to everyone. Everything else needs payment.
+//  Right now purchase() just flips a local flag so you can SEE the
+//  flow. To make it real, replace the body of purchase() with a
+//  Stripe Checkout call + a backend that verifies the payment and
+//  stores hasPaid on the user's account. See the build guide.
+// ============================================================
+const FREE_LEVELS = ["A1"];               // A1 free; A2–C1 are premium
+const PRICE_LABEL = "$5";                 // display only
+const isPremiumLevel = (lvl) => !FREE_LEVELS.includes(lvl);
+// Free taster: the FIRST unit of each premium level is playable for free,
+// so people taste real A2–C1 content before deciding to pay.
+const isTasterUnit = (lvl, unitIndex) => isPremiumLevel(lvl) && unitIndex === 0;
+// Can the user open this specific unit right now?
+const canAccessUnit = (lvl, unitIndex, hasPaid) => hasPaid || !isPremiumLevel(lvl) || isTasterUnit(lvl, unitIndex);
+
+// >>> REPLACE THIS for production <<<
+// Production flow:
+//   1. Front-end calls your backend:  POST /create-checkout-session
+//   2. Backend creates a Stripe Checkout Session, returns its URL.
+//   3. Redirect the user to that URL (window.location = url).
+//   4. Stripe redirects back after payment; your backend's webhook
+//      (checkout.session.completed) sets hasPaid=true in your DB.
+//   5. App re-fetches the user and sees hasPaid=true.
+// For this offline demo we just resolve true after a short "processing".
+function purchaseUnlock() {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve({ ok: true }), 1200); // simulate network/payment
+  });
+}
+
+
+// ============================================================
+//  UNLOCK LOGIC
+//  A level can be locked for two reasons:
+//   - "pay"  : it's a premium level and the user hasn't unlocked ($5)
+//   - "work" : progression gate (previous level not far enough along)
+//  Payment is checked first: no point gating by progress on a level
+//  the user can't access yet anyway.
+// ============================================================
+const UNLOCK_NEEDED = (lv) => Math.ceil(lv.units.length * 0.6); // ~60% of prev level
+function computeUnlocks(scores, hasPaid) {
+  const status = {};
+  CURRICULUM.forEach((lv, i) => {
+    if (i === 0) { status[lv.level] = { locked: false, reason: null }; return; }
+    const prev = CURRICULUM[i - 1];
+    const have = prev.units.filter((u) => scores[u.id] != null).length;
+    const need = UNLOCK_NEEDED(prev);
+    if (isPremiumLevel(lv.level) && !hasPaid) {
+      status[lv.level] = { locked: true, reason: "pay", need, have, prevName: prev.name };
+    } else if (have < need) {
+      status[lv.level] = { locked: true, reason: "work", need, have, prevName: prev.name };
+    } else {
+      status[lv.level] = { locked: false, reason: null, need, have, prevName: prev.name };
+    }
+  });
+  return status;
+}
+const starsFor = (score) => score == null ? 0 : score === 100 ? 3 : score >= 70 ? 2 : score >= 1 ? 1 : 0;
+
+// ============================================================
+//  ONBOARDING / REGISTRATION
+// ============================================================
+const COUNTRY_CODES = [
+  { c: "+1", f: "🇺🇸", n: "United States", iso: "US" },
+  { c: "+1", f: "🇨🇦", n: "Canada", iso: "CA" },
+  { c: "+44", f: "🇬🇧", n: "United Kingdom", iso: "GB" },
+  { c: "+91", f: "🇮🇳", n: "India", iso: "IN" },
+  { c: "+33", f: "🇫🇷", n: "France", iso: "FR" },
+  { c: "+61", f: "🇦🇺", n: "Australia", iso: "AU" },
+  { c: "+93", f: "🇦🇫", n: "Afghanistan", iso: "AF" },
+  { c: "+358", f: "🇦🇽", n: "Åland Islands", iso: "AX" },
+  { c: "+355", f: "🇦🇱", n: "Albania", iso: "AL" },
+  { c: "+213", f: "🇩🇿", n: "Algeria", iso: "DZ" },
+  { c: "+1", f: "🇦🇸", n: "American Samoa", iso: "AS" },
+  { c: "+376", f: "🇦🇩", n: "Andorra", iso: "AD" },
+  { c: "+244", f: "🇦🇴", n: "Angola", iso: "AO" },
+  { c: "+1", f: "🇦🇮", n: "Anguilla", iso: "AI" },
+  { c: "+1", f: "🇦🇬", n: "Antigua & Barbuda", iso: "AG" },
+  { c: "+54", f: "🇦🇷", n: "Argentina", iso: "AR" },
+  { c: "+374", f: "🇦🇲", n: "Armenia", iso: "AM" },
+  { c: "+297", f: "🇦🇼", n: "Aruba", iso: "AW" },
+  { c: "+43", f: "🇦🇹", n: "Austria", iso: "AT" },
+  { c: "+994", f: "🇦🇿", n: "Azerbaijan", iso: "AZ" },
+  { c: "+1", f: "🇧🇸", n: "Bahamas", iso: "BS" },
+  { c: "+973", f: "🇧🇭", n: "Bahrain", iso: "BH" },
+  { c: "+880", f: "🇧🇩", n: "Bangladesh", iso: "BD" },
+  { c: "+1", f: "🇧🇧", n: "Barbados", iso: "BB" },
+  { c: "+375", f: "🇧🇾", n: "Belarus", iso: "BY" },
+  { c: "+32", f: "🇧🇪", n: "Belgium", iso: "BE" },
+  { c: "+501", f: "🇧🇿", n: "Belize", iso: "BZ" },
+  { c: "+229", f: "🇧🇯", n: "Benin", iso: "BJ" },
+  { c: "+1", f: "🇧🇲", n: "Bermuda", iso: "BM" },
+  { c: "+975", f: "🇧🇹", n: "Bhutan", iso: "BT" },
+  { c: "+591", f: "🇧🇴", n: "Bolivia", iso: "BO" },
+  { c: "+387", f: "🇧🇦", n: "Bosnia & Herzegovina", iso: "BA" },
+  { c: "+267", f: "🇧🇼", n: "Botswana", iso: "BW" },
+  { c: "+55", f: "🇧🇷", n: "Brazil", iso: "BR" },
+  { c: "+246", f: "🇮🇴", n: "British Indian Ocean Terr.", iso: "IO" },
+  { c: "+1", f: "🇻🇬", n: "British Virgin Islands", iso: "VG" },
+  { c: "+673", f: "🇧🇳", n: "Brunei", iso: "BN" },
+  { c: "+359", f: "🇧🇬", n: "Bulgaria", iso: "BG" },
+  { c: "+226", f: "🇧🇫", n: "Burkina Faso", iso: "BF" },
+  { c: "+257", f: "🇧🇮", n: "Burundi", iso: "BI" },
+  { c: "+855", f: "🇰🇭", n: "Cambodia", iso: "KH" },
+  { c: "+237", f: "🇨🇲", n: "Cameroon", iso: "CM" },
+  { c: "+238", f: "🇨🇻", n: "Cape Verde", iso: "CV" },
+  { c: "+1", f: "🇰🇾", n: "Cayman Islands", iso: "KY" },
+  { c: "+236", f: "🇨🇫", n: "Central African Rep.", iso: "CF" },
+  { c: "+235", f: "🇹🇩", n: "Chad", iso: "TD" },
+  { c: "+56", f: "🇨🇱", n: "Chile", iso: "CL" },
+  { c: "+86", f: "🇨🇳", n: "China", iso: "CN" },
+  { c: "+57", f: "🇨🇴", n: "Colombia", iso: "CO" },
+  { c: "+269", f: "🇰🇲", n: "Comoros", iso: "KM" },
+  { c: "+242", f: "🇨🇬", n: "Congo", iso: "CG" },
+  { c: "+243", f: "🇨🇩", n: "Congo (DRC)", iso: "CD" },
+  { c: "+682", f: "🇨🇰", n: "Cook Islands", iso: "CK" },
+  { c: "+506", f: "🇨🇷", n: "Costa Rica", iso: "CR" },
+  { c: "+225", f: "🇨🇮", n: "Côte d'Ivoire", iso: "CI" },
+  { c: "+385", f: "🇭🇷", n: "Croatia", iso: "HR" },
+  { c: "+53", f: "🇨🇺", n: "Cuba", iso: "CU" },
+  { c: "+599", f: "🇨🇼", n: "Curaçao", iso: "CW" },
+  { c: "+357", f: "🇨🇾", n: "Cyprus", iso: "CY" },
+  { c: "+420", f: "🇨🇿", n: "Czechia", iso: "CZ" },
+  { c: "+45", f: "🇩🇰", n: "Denmark", iso: "DK" },
+  { c: "+253", f: "🇩🇯", n: "Djibouti", iso: "DJ" },
+  { c: "+1", f: "🇩🇲", n: "Dominica", iso: "DM" },
+  { c: "+1", f: "🇩🇴", n: "Dominican Rep.", iso: "DO" },
+  { c: "+593", f: "🇪🇨", n: "Ecuador", iso: "EC" },
+  { c: "+20", f: "🇪🇬", n: "Egypt", iso: "EG" },
+  { c: "+503", f: "🇸🇻", n: "El Salvador", iso: "SV" },
+  { c: "+240", f: "🇬🇶", n: "Equatorial Guinea", iso: "GQ" },
+  { c: "+291", f: "🇪🇷", n: "Eritrea", iso: "ER" },
+  { c: "+372", f: "🇪🇪", n: "Estonia", iso: "EE" },
+  { c: "+268", f: "🇸🇿", n: "Eswatini", iso: "SZ" },
+  { c: "+251", f: "🇪🇹", n: "Ethiopia", iso: "ET" },
+  { c: "+500", f: "🇫🇰", n: "Falkland Islands", iso: "FK" },
+  { c: "+298", f: "🇫🇴", n: "Faroe Islands", iso: "FO" },
+  { c: "+679", f: "🇫🇯", n: "Fiji", iso: "FJ" },
+  { c: "+358", f: "🇫🇮", n: "Finland", iso: "FI" },
+  { c: "+594", f: "🇬🇫", n: "French Guiana", iso: "GF" },
+  { c: "+689", f: "🇵🇫", n: "French Polynesia", iso: "PF" },
+  { c: "+241", f: "🇬🇦", n: "Gabon", iso: "GA" },
+  { c: "+220", f: "🇬🇲", n: "Gambia", iso: "GM" },
+  { c: "+995", f: "🇬🇪", n: "Georgia", iso: "GE" },
+  { c: "+49", f: "🇩🇪", n: "Germany", iso: "DE" },
+  { c: "+233", f: "🇬🇭", n: "Ghana", iso: "GH" },
+  { c: "+350", f: "🇬🇮", n: "Gibraltar", iso: "GI" },
+  { c: "+30", f: "🇬🇷", n: "Greece", iso: "GR" },
+  { c: "+299", f: "🇬🇱", n: "Greenland", iso: "GL" },
+  { c: "+1", f: "🇬🇩", n: "Grenada", iso: "GD" },
+  { c: "+590", f: "🇬🇵", n: "Guadeloupe", iso: "GP" },
+  { c: "+1", f: "🇬🇺", n: "Guam", iso: "GU" },
+  { c: "+502", f: "🇬🇹", n: "Guatemala", iso: "GT" },
+  { c: "+44", f: "🇬🇬", n: "Guernsey", iso: "GG" },
+  { c: "+224", f: "🇬🇳", n: "Guinea", iso: "GN" },
+  { c: "+245", f: "🇬🇼", n: "Guinea-Bissau", iso: "GW" },
+  { c: "+592", f: "🇬🇾", n: "Guyana", iso: "GY" },
+  { c: "+509", f: "🇭🇹", n: "Haiti", iso: "HT" },
+  { c: "+504", f: "🇭🇳", n: "Honduras", iso: "HN" },
+  { c: "+852", f: "🇭🇰", n: "Hong Kong", iso: "HK" },
+  { c: "+36", f: "🇭🇺", n: "Hungary", iso: "HU" },
+  { c: "+354", f: "🇮🇸", n: "Iceland", iso: "IS" },
+  { c: "+62", f: "🇮🇩", n: "Indonesia", iso: "ID" },
+  { c: "+98", f: "🇮🇷", n: "Iran", iso: "IR" },
+  { c: "+964", f: "🇮🇶", n: "Iraq", iso: "IQ" },
+  { c: "+353", f: "🇮🇪", n: "Ireland", iso: "IE" },
+  { c: "+44", f: "🇮🇲", n: "Isle of Man", iso: "IM" },
+  { c: "+972", f: "🇮🇱", n: "Israel", iso: "IL" },
+  { c: "+39", f: "🇮🇹", n: "Italy", iso: "IT" },
+  { c: "+1", f: "🇯🇲", n: "Jamaica", iso: "JM" },
+  { c: "+81", f: "🇯🇵", n: "Japan", iso: "JP" },
+  { c: "+44", f: "🇯🇪", n: "Jersey", iso: "JE" },
+  { c: "+962", f: "🇯🇴", n: "Jordan", iso: "JO" },
+  { c: "+7", f: "🇰🇿", n: "Kazakhstan", iso: "KZ" },
+  { c: "+254", f: "🇰🇪", n: "Kenya", iso: "KE" },
+  { c: "+686", f: "🇰🇮", n: "Kiribati", iso: "KI" },
+  { c: "+383", f: "🇽🇰", n: "Kosovo", iso: "XK" },
+  { c: "+965", f: "🇰🇼", n: "Kuwait", iso: "KW" },
+  { c: "+996", f: "🇰🇬", n: "Kyrgyzstan", iso: "KG" },
+  { c: "+856", f: "🇱🇦", n: "Laos", iso: "LA" },
+  { c: "+371", f: "🇱🇻", n: "Latvia", iso: "LV" },
+  { c: "+961", f: "🇱🇧", n: "Lebanon", iso: "LB" },
+  { c: "+266", f: "🇱🇸", n: "Lesotho", iso: "LS" },
+  { c: "+231", f: "🇱🇷", n: "Liberia", iso: "LR" },
+  { c: "+218", f: "🇱🇾", n: "Libya", iso: "LY" },
+  { c: "+423", f: "🇱🇮", n: "Liechtenstein", iso: "LI" },
+  { c: "+370", f: "🇱🇹", n: "Lithuania", iso: "LT" },
+  { c: "+352", f: "🇱🇺", n: "Luxembourg", iso: "LU" },
+  { c: "+853", f: "🇲🇴", n: "Macau", iso: "MO" },
+  { c: "+261", f: "🇲🇬", n: "Madagascar", iso: "MG" },
+  { c: "+265", f: "🇲🇼", n: "Malawi", iso: "MW" },
+  { c: "+60", f: "🇲🇾", n: "Malaysia", iso: "MY" },
+  { c: "+960", f: "🇲🇻", n: "Maldives", iso: "MV" },
+  { c: "+223", f: "🇲🇱", n: "Mali", iso: "ML" },
+  { c: "+356", f: "🇲🇹", n: "Malta", iso: "MT" },
+  { c: "+692", f: "🇲🇭", n: "Marshall Islands", iso: "MH" },
+  { c: "+596", f: "🇲🇶", n: "Martinique", iso: "MQ" },
+  { c: "+222", f: "🇲🇷", n: "Mauritania", iso: "MR" },
+  { c: "+230", f: "🇲🇺", n: "Mauritius", iso: "MU" },
+  { c: "+262", f: "🇾🇹", n: "Mayotte", iso: "YT" },
+  { c: "+52", f: "🇲🇽", n: "Mexico", iso: "MX" },
+  { c: "+691", f: "🇫🇲", n: "Micronesia", iso: "FM" },
+  { c: "+373", f: "🇲🇩", n: "Moldova", iso: "MD" },
+  { c: "+377", f: "🇲🇨", n: "Monaco", iso: "MC" },
+  { c: "+976", f: "🇲🇳", n: "Mongolia", iso: "MN" },
+  { c: "+382", f: "🇲🇪", n: "Montenegro", iso: "ME" },
+  { c: "+1", f: "🇲🇸", n: "Montserrat", iso: "MS" },
+  { c: "+212", f: "🇲🇦", n: "Morocco", iso: "MA" },
+  { c: "+258", f: "🇲🇿", n: "Mozambique", iso: "MZ" },
+  { c: "+95", f: "🇲🇲", n: "Myanmar", iso: "MM" },
+  { c: "+264", f: "🇳🇦", n: "Namibia", iso: "NA" },
+  { c: "+674", f: "🇳🇷", n: "Nauru", iso: "NR" },
+  { c: "+977", f: "🇳🇵", n: "Nepal", iso: "NP" },
+  { c: "+31", f: "🇳🇱", n: "Netherlands", iso: "NL" },
+  { c: "+687", f: "🇳🇨", n: "New Caledonia", iso: "NC" },
+  { c: "+64", f: "🇳🇿", n: "New Zealand", iso: "NZ" },
+  { c: "+505", f: "🇳🇮", n: "Nicaragua", iso: "NI" },
+  { c: "+227", f: "🇳🇪", n: "Niger", iso: "NE" },
+  { c: "+234", f: "🇳🇬", n: "Nigeria", iso: "NG" },
+  { c: "+683", f: "🇳🇺", n: "Niue", iso: "NU" },
+  { c: "+672", f: "🇳🇫", n: "Norfolk Island", iso: "NF" },
+  { c: "+850", f: "🇰🇵", n: "North Korea", iso: "KP" },
+  { c: "+389", f: "🇲🇰", n: "North Macedonia", iso: "MK" },
+  { c: "+1", f: "🇲🇵", n: "Northern Mariana Is.", iso: "MP" },
+  { c: "+47", f: "🇳🇴", n: "Norway", iso: "NO" },
+  { c: "+968", f: "🇴🇲", n: "Oman", iso: "OM" },
+  { c: "+92", f: "🇵🇰", n: "Pakistan", iso: "PK" },
+  { c: "+680", f: "🇵🇼", n: "Palau", iso: "PW" },
+  { c: "+970", f: "🇵🇸", n: "Palestine", iso: "PS" },
+  { c: "+507", f: "🇵🇦", n: "Panama", iso: "PA" },
+  { c: "+675", f: "🇵🇬", n: "Papua New Guinea", iso: "PG" },
+  { c: "+595", f: "🇵🇾", n: "Paraguay", iso: "PY" },
+  { c: "+51", f: "🇵🇪", n: "Peru", iso: "PE" },
+  { c: "+63", f: "🇵🇭", n: "Philippines", iso: "PH" },
+  { c: "+48", f: "🇵🇱", n: "Poland", iso: "PL" },
+  { c: "+351", f: "🇵🇹", n: "Portugal", iso: "PT" },
+  { c: "+1", f: "🇵🇷", n: "Puerto Rico", iso: "PR" },
+  { c: "+974", f: "🇶🇦", n: "Qatar", iso: "QA" },
+  { c: "+262", f: "🇷🇪", n: "Réunion", iso: "RE" },
+  { c: "+40", f: "🇷🇴", n: "Romania", iso: "RO" },
+  { c: "+7", f: "🇷🇺", n: "Russia", iso: "RU" },
+  { c: "+250", f: "🇷🇼", n: "Rwanda", iso: "RW" },
+  { c: "+685", f: "🇼🇸", n: "Samoa", iso: "WS" },
+  { c: "+378", f: "🇸🇲", n: "San Marino", iso: "SM" },
+  { c: "+239", f: "🇸🇹", n: "São Tomé & Príncipe", iso: "ST" },
+  { c: "+966", f: "🇸🇦", n: "Saudi Arabia", iso: "SA" },
+  { c: "+221", f: "🇸🇳", n: "Senegal", iso: "SN" },
+  { c: "+381", f: "🇷🇸", n: "Serbia", iso: "RS" },
+  { c: "+248", f: "🇸🇨", n: "Seychelles", iso: "SC" },
+  { c: "+232", f: "🇸🇱", n: "Sierra Leone", iso: "SL" },
+  { c: "+65", f: "🇸🇬", n: "Singapore", iso: "SG" },
+  { c: "+1", f: "🇸🇽", n: "Sint Maarten", iso: "SX" },
+  { c: "+421", f: "🇸🇰", n: "Slovakia", iso: "SK" },
+  { c: "+386", f: "🇸🇮", n: "Slovenia", iso: "SI" },
+  { c: "+677", f: "🇸🇧", n: "Solomon Islands", iso: "SB" },
+  { c: "+252", f: "🇸🇴", n: "Somalia", iso: "SO" },
+  { c: "+27", f: "🇿🇦", n: "South Africa", iso: "ZA" },
+  { c: "+82", f: "🇰🇷", n: "South Korea", iso: "KR" },
+  { c: "+211", f: "🇸🇸", n: "South Sudan", iso: "SS" },
+  { c: "+34", f: "🇪🇸", n: "Spain", iso: "ES" },
+  { c: "+94", f: "🇱🇰", n: "Sri Lanka", iso: "LK" },
+  { c: "+590", f: "🇧🇱", n: "St. Barthélemy", iso: "BL" },
+  { c: "+290", f: "🇸🇭", n: "St. Helena", iso: "SH" },
+  { c: "+1", f: "🇰🇳", n: "St. Kitts & Nevis", iso: "KN" },
+  { c: "+1", f: "🇱🇨", n: "St. Lucia", iso: "LC" },
+  { c: "+590", f: "🇲🇫", n: "St. Martin", iso: "MF" },
+  { c: "+508", f: "🇵🇲", n: "St. Pierre & Miquelon", iso: "PM" },
+  { c: "+1", f: "🇻🇨", n: "St. Vincent", iso: "VC" },
+  { c: "+249", f: "🇸🇩", n: "Sudan", iso: "SD" },
+  { c: "+597", f: "🇸🇷", n: "Suriname", iso: "SR" },
+  { c: "+46", f: "🇸🇪", n: "Sweden", iso: "SE" },
+  { c: "+41", f: "🇨🇭", n: "Switzerland", iso: "CH" },
+  { c: "+963", f: "🇸🇾", n: "Syria", iso: "SY" },
+  { c: "+886", f: "🇹🇼", n: "Taiwan", iso: "TW" },
+  { c: "+992", f: "🇹🇯", n: "Tajikistan", iso: "TJ" },
+  { c: "+255", f: "🇹🇿", n: "Tanzania", iso: "TZ" },
+  { c: "+66", f: "🇹🇭", n: "Thailand", iso: "TH" },
+  { c: "+670", f: "🇹🇱", n: "Timor-Leste", iso: "TL" },
+  { c: "+228", f: "🇹🇬", n: "Togo", iso: "TG" },
+  { c: "+690", f: "🇹🇰", n: "Tokelau", iso: "TK" },
+  { c: "+676", f: "🇹🇴", n: "Tonga", iso: "TO" },
+  { c: "+1", f: "🇹🇹", n: "Trinidad & Tobago", iso: "TT" },
+  { c: "+216", f: "🇹🇳", n: "Tunisia", iso: "TN" },
+  { c: "+90", f: "🇹🇷", n: "Türkiye", iso: "TR" },
+  { c: "+993", f: "🇹🇲", n: "Turkmenistan", iso: "TM" },
+  { c: "+1", f: "🇹🇨", n: "Turks & Caicos", iso: "TC" },
+  { c: "+688", f: "🇹🇻", n: "Tuvalu", iso: "TV" },
+  { c: "+971", f: "🇦🇪", n: "UAE", iso: "AE" },
+  { c: "+256", f: "🇺🇬", n: "Uganda", iso: "UG" },
+  { c: "+380", f: "🇺🇦", n: "Ukraine", iso: "UA" },
+  { c: "+598", f: "🇺🇾", n: "Uruguay", iso: "UY" },
+  { c: "+998", f: "🇺🇿", n: "Uzbekistan", iso: "UZ" },
+  { c: "+678", f: "🇻🇺", n: "Vanuatu", iso: "VU" },
+  { c: "+39", f: "🇻🇦", n: "Vatican City", iso: "VA" },
+  { c: "+58", f: "🇻🇪", n: "Venezuela", iso: "VE" },
+  { c: "+84", f: "🇻🇳", n: "Vietnam", iso: "VN" },
+  { c: "+681", f: "🇼🇫", n: "Wallis & Futuna", iso: "WF" },
+  { c: "+967", f: "🇾🇪", n: "Yemen", iso: "YE" },
+  { c: "+260", f: "🇿🇲", n: "Zambia", iso: "ZM" },
+  { c: "+263", f: "🇿🇼", n: "Zimbabwe", iso: "ZW" },
+];
+const emailValid = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
+const phoneValid = (p) => /^[0-9 ()-]{6,15}$/.test(p.trim());
+
+function Landing({ onAuthed }) {
+  const [step, setStep] = useState("welcome"); // welcome | details | avatar
+  const [first, setFirst] = useState("");
+  const [last, setLast] = useState("");
+  const [email, setEmail] = useState("");
+  const [cc, setCc] = useState("US"); // ISO of selected country (unique)
+  const [phone, setPhone] = useState("");
+  const [avatar, setAvatar] = useState(null);
+  const [tab, setTab] = useState("female");
+  const [touched, setTouched] = useState(false);
+
+  const dialCode = (COUNTRY_CODES.find((x) => x.iso === cc) || { c: "+1" }).c;
+  const detailsOk = first.trim() && last.trim() && emailValid(email) && phoneValid(phone);
+  const finish = () => onAuthed(registerUser({
+    firstName: first, lastName: last, email,
+    phone: dialCode + " " + phone.trim(), avatar: avatar || defaultAvatar(first + last),
+  }));
+
+  return (
+    <div className="landing">
+      <div className="grain" />
+      <div className="land-inner">
+        <div className="land-mark">H</div>
+        <p className="eyebrow center">Apprendre le français · A1 → C1</p>
+        <h1 className="land-title">French with Halle</h1>
+
+        {step === "welcome" && (
+          <>
+            <p className="land-sub">A French course that plays like a game. Unlock levels, earn stars, keep your streak alive — and pick up right where you left off, every time.</p>
+            <div className="land-actions">
+              <button className="cta" onClick={() => setStep("details")}>Create your account →</button>
+              <p className="land-fine">Quick sign-up. Your progress is saved to your profile so it's always here when you come back.</p>
+            </div>
+            <div className="land-feats">
+              <div className="lf"><span>🎯</span><p>Daily goals & streaks</p></div>
+              <div className="lf"><span>🔓</span><p>Unlock levels as you grow</p></div>
+              <div className="lf"><span>🔊</span><p>Hear every word spoken</p></div>
+            </div>
+          </>
+        )}
+
+        {step === "details" && (
+          <div className="land-form">
+            <p className="form-step">Step 1 of 2 · Your details</p>
+            <div className="form-2col">
+              <div><label>First name</label>
+                <input className={`field ${touched && !first.trim() ? "bad" : ""}`} autoFocus value={first} placeholder="Marie" onChange={(e) => setFirst(e.target.value)} /></div>
+              <div><label>Last name</label>
+                <input className={`field ${touched && !last.trim() ? "bad" : ""}`} value={last} placeholder="Dupont" onChange={(e) => setLast(e.target.value)} /></div>
+            </div>
+            <label>Email</label>
+            <input className={`field ${touched && !emailValid(email) ? "bad" : ""}`} type="email" value={email} placeholder="marie@example.com" onChange={(e) => setEmail(e.target.value)} />
+            <label>Phone number</label>
+            <div className="phone-row">
+              <select className="cc-select" value={cc} onChange={(e) => setCc(e.target.value)} aria-label="Country code">
+                {COUNTRY_CODES.map((x) => <option key={x.iso} value={x.iso}>{x.f} {x.n} ({x.c})</option>)}
+              </select>
+              <input className={`field ${touched && !phoneValid(phone) ? "bad" : ""}`} type="tel" value={phone} placeholder="555 123 4567" onChange={(e) => setPhone(e.target.value)} />
+            </div>
+            {touched && !detailsOk && <p className="form-err">Please fill in every field with a valid email and phone number.</p>}
+            <button className="cta" onClick={() => { setTouched(true); if (detailsOk) setStep("avatar"); }}>Continue →</button>
+            <button className="textback" onClick={() => setStep("welcome")}>← Back</button>
+          </div>
+        )}
+
+        {step === "avatar" && (
+          <div className="land-form">
+            <p className="form-step">Step 2 of 2 · Choose your character</p>
+            <div className="av-preview">{avatar || "🙂"}</div>
+            <div className="av-tabs">
+              {[["female", "Female"], ["male", "Male"], ["other", "More"]].map(([k, lab]) => (
+                <button key={k} className={`av-tab ${tab === k ? "on" : ""}`} onClick={() => setTab(k)}>{lab}</button>
+              ))}
+            </div>
+            <div className="av-grid">
+              {AVATAR_SETS[tab].map((a) => (
+                <button key={a} className={`av-opt ${avatar === a ? "on" : ""}`} onClick={() => setAvatar(a)}>{a}</button>
+              ))}
+            </div>
+            <button className="cta" disabled={!avatar} onClick={finish}>Start learning →</button>
+            <button className="textback" onClick={() => setStep("details")}>← Back</button>
+          </div>
+        )}
+      </div>
+      <footer className="land-foot">Built for serious, joyful study · <em>bon courage</em></footer>
+    </div>
+  );
+}
+
+// ============================================================
+//  PROFILE PANEL
+// ============================================================
+function Profile({ user, progress, onClose, onSignOut, unlockStatus, onChangeAvatar }) {
+  const doneUnits = Object.keys(progress.scores).length;
+  const totalStars = Object.values(progress.scores).reduce((s, v) => s + starsFor(v), 0);
+  const maxStars = allUnits.length * 3;
+  const level = Math.floor(progress.xp / 150) + 1;
+  const rank = ["Débutant", "Apprenti", "Voyageur", "Causeur", "Éloquent", "Maître"][Math.min(level - 1, 5)];
+  const unlocked = CURRICULUM.filter((lv) => !unlockStatus[lv.level].locked).length;
+  const [editing, setEditing] = useState(false);
+  const [tab, setTab] = useState("female");
+
+  return (
+    <div className="modal-bg" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-x" onClick={onClose}>×</button>
+        <div className="prof-head">
+          <button className="prof-av" onClick={() => setEditing((v) => !v)} title="Change character">
+            {avatarOf(user)}<span className="prof-av-edit">✎</span>
+          </button>
+          <div>
+            <h2>{user.name}</h2>
+            <p className="prof-sub">{user.email} · {rank}</p>
+            {user.phone && <p className="prof-phone">{user.phone}</p>}
+          </div>
+        </div>
+        {editing && (
+          <div className="prof-avpick">
+            <div className="av-tabs">
+              {[["female", "Female"], ["male", "Male"], ["other", "More"]].map(([k, lab]) => (
+                <button key={k} className={`av-tab ${tab === k ? "on" : ""}`} onClick={() => setTab(k)}>{lab}</button>
+              ))}
+            </div>
+            <div className="av-grid">
+              {AVATAR_SETS[tab].map((a) => (
+                <button key={a} className={`av-opt ${avatarOf(user) === a ? "on" : ""}`}
+                  onClick={() => { onChangeAvatar(a); setEditing(false); }}>{a}</button>
+              ))}
+            </div>
+          </div>
+        )}
+        <div className="prof-grid">
+          <div className="prof-stat"><b>{progress.xp}</b><span>Total XP</span></div>
+          <div className="prof-stat"><b>Lv {level}</b><span>{rank}</span></div>
+          <div className="prof-stat"><b>🔥 {progress.streak}</b><span>Day streak</span></div>
+          <div className="prof-stat"><b>{doneUnits}/{allUnits.length}</b><span>Units done</span></div>
+          <div className="prof-stat"><b>⭐ {totalStars}/{maxStars}</b><span>Stars earned</span></div>
+          <div className="prof-stat"><b>{unlocked}/{CURRICULUM.length}</b><span>Levels open</span></div>
+        </div>
+        <div className="prof-best">Best challenge score: <b>{progress.bestChallenge}</b></div>
+        <div className={`prof-plan ${progress.hasPaid ? "pro" : ""}`}>
+          {progress.hasPaid ? "✦ Full course unlocked — merci !" : "Free plan · A1 + previews"}
+        </div>
+        <button className="ghost wide" onClick={onSignOut}>Sign out</button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+//  PAYWALL MODAL  (the $5 one-time unlock)
+// ============================================================
+function Paywall({ onClose, onBuy, state }) {
+  return (
+    <div className="modal-bg" onClick={state === "processing" ? undefined : onClose}>
+      <div className="modal paywall" onClick={(e) => e.stopPropagation()}>
+        {state !== "processing" && <button className="modal-x" onClick={onClose}>×</button>}
+        <div className="pw-badge">✦ Full Course</div>
+        <h2 className="pw-title">Unlock every level</h2>
+        <p className="pw-price"><b>{PRICE_LABEL}</b> <span>one-time · yours forever</span></p>
+        <ul className="pw-list">
+          <li>{CURRICULUM.filter(l => isPremiumLevel(l.level)).reduce((s, l) => s + l.units.length, 0)} units across A2 → C1, beyond the free previews</li>
+          <li>{CURRICULUM.filter(l => isPremiumLevel(l.level)).reduce((s, l) => s + l.units.reduce((a, u) => a + u.ex.length, 0), 0)}+ exercises: grammar, conjugation, listening, word-building & fill-the-blank</li>
+          <li>Keep your stars, XP and streak across everything</li>
+          <li>One payment — no subscription, ever</li>
+        </ul>
+        {state === "done" ? (
+          <div className="pw-done">✓ Unlocked! Bienvenue.</div>
+        ) : (
+          <button className="cta wide buybtn" disabled={state === "processing"} onClick={onBuy}>
+            {state === "processing" ? "Processing…" : `Unlock for ${PRICE_LABEL}`}
+          </button>
+        )}
+        <p className="pw-fine">Demo checkout — no real charge. In the live app this opens secure Stripe payment.</p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+//  MAIN APP
+// ============================================================
+function App() {
+  const [userKey, setUserKey] = useState(() => safeGet().current);
+  const [user, setUser] = useState(null);
+  const [progress, setProgress] = useState(blankProgress());
+  const [route, setRoute] = useState({ name: "home" });
+  const [openLevel, setOpenLevel] = useState("A1");
+  const [showProfile, setShowProfile] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  // load profile whenever userKey changes
+  useEffect(() => {
+    if (!userKey) { setUser(null); return; }
+    const data = safeGet();
+    const u = data.users[userKey];
+    if (!u) { setUserKey(null); return; }
+    setUser(u);
+    // streak bookkeeping on login
+    const today = dayIdx();
+    const p = { ...blankProgress(), ...u.progress };
+    if (p.lastDay == null) { p.streak = 1; }
+    else if (p.lastDay === today) { /* same day, keep */ }
+    else if (p.lastDay === today - 1) { p.streak = (p.streak || 0) + 1; }
+    else { p.streak = 1; }
+    p.lastDay = today;
+    // reset the daily counter when a new day begins
+    if (p.todayDay !== today) { p.todayDay = today; p.todayCount = 0; }
+    // mirror settings into the module-level LIVE holder for norm()/speak()
+    const st = p.settings || {};
+    LIVE.audioSpeed = st.audioSpeed || "normal";
+    LIVE.strictAccents = !!st.strictAccents;
+    LIVE.autoAdvance = !!st.autoAdvance;
+    LIVE.voiceURI = st.voiceURI || null;
+    LIVE.pitch = st.pitch || 1;
+    setProgress(p);
+    // write the streak/lastDay update back so it persists
+    const d2 = safeGet();
+    if (d2.users[userKey]) { d2.users[userKey].progress = p; safeSet(d2); }
+  }, [userKey]);
+
+  // persist via functional update so concurrent calls compose (no clobbering).
+  // `updater` receives the freshest progress and returns the next progress.
+  const persist = useCallback((updater) => {
+    setProgress((prev) => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      const data = safeGet();
+      if (userKey && data.users[userKey]) { data.users[userKey].progress = next; safeSet(data); }
+      return next;
+    });
+  }, [userKey]);
+
+  const unlockStatus = useMemo(() => computeUnlocks(progress.scores, progress.hasPaid), [progress.scores, progress.hasPaid]);
+
+  const awardXP = useCallback((n) => {
+    persist((p) => ({ ...p, xp: p.xp + n }));
+  }, [persist]);
+
+  const completeUnit = useCallback((unitId, score) => {
+    persist((p) => {
+      const newScore = Math.max(p.scores[unitId] || 0, score);
+      const wasUnlocked = computeUnlocks(p.scores, p.hasPaid);
+      const nextScores = { ...p.scores, [unitId]: newScore };
+      const nowUnlocked = computeUnlocks(nextScores, p.hasPaid);
+      let newlyOpened = null;
+      CURRICULUM.forEach((lv) => {
+        if (wasUnlocked[lv.level].locked && !nowUnlocked[lv.level].locked) newlyOpened = lv;
+      });
+      if (newlyOpened) {
+        // defer setState out of the updater
+        setTimeout(() => {
+          setToast({ type: "unlock", level: newlyOpened.level, name: newlyOpened.name });
+          setTimeout(() => setToast(null), 4200);
+        }, 0);
+      }
+      return { ...p, scores: nextScores };
+    });
+  }, [persist]);
+
+  const recordChallenge = useCallback((score) => {
+    persist((p) => score > (p.bestChallenge || 0) ? { ...p, bestChallenge: score } : p);
+  }, [persist]);
+
+  const claimDaily = useCallback(() => {
+    persist((p) => ({ ...p, dailyClaimedDay: dayIdx() }));
+  }, [persist]);
+
+  // count every answered question toward today's goal + history (for the calendar)
+  const recordAnswer = useCallback(() => {
+    persist((p) => {
+      const today = dayIdx();
+      const sameDay = p.todayDay === today;
+      const todayCount = (sameDay ? (p.todayCount || 0) : 0) + 1;
+      const history = { ...(p.history || {}), [today]: todayCount };
+      return { ...p, todayDay: today, todayCount, history };
+    });
+  }, [persist]);
+
+  const changeGoal = useCallback((g) => {
+    persist((p) => ({ ...p, dailyGoal: g }));
+  }, [persist]);
+
+  // schedule a flashcard after the learner rates their recall
+  const reviewCard = useCallback((wordId, rating) => {
+    persist((p) => {
+      const today = dayIdx();
+      const srs = { ...(p.srs || {}) };
+      srs[wordId] = scheduleCard(srs[wordId], rating, today);
+      return { ...p, srs };
+    });
+    awardXP(rating === 0 ? 2 : 5); // small XP for reviewing; less if "again"
+  }, [persist, awardXP]);
+
+  const changeSettings = useCallback((next) => {
+    // update the live mirror immediately so it affects the current session
+    LIVE.audioSpeed = next.audioSpeed || "normal";
+    LIVE.strictAccents = !!next.strictAccents;
+    LIVE.autoAdvance = !!next.autoAdvance;
+    LIVE.voiceURI = next.voiceURI || null;
+    LIVE.pitch = next.pitch || 1;
+    persist((p) => ({ ...p, settings: next }));
+  }, [persist]);
+
+  // ---- purchase the $5 unlock ----
+  const [buyState, setBuyState] = useState("idle"); // idle | processing | done
+  const startPurchase = useCallback(async () => {
+    setBuyState("processing");
+    const res = await purchaseUnlock();   // ← becomes the real Stripe call later
+    if (res && res.ok) {
+      persist((p) => ({ ...p, hasPaid: true }));
+      setBuyState("done");
+      setTimeout(() => { setBuyState("idle"); setShowPaywall(false); }, 1400);
+    } else {
+      setBuyState("idle");
+    }
+  }, [persist]);
+
+  // ---- not signed in ----
+  if (!userKey || !user) {
+    return (<><style>{CSS}</style><Landing onAuthed={(k) => setUserKey(k)} /></>);
+  }
+
+  // ---- derived display values ----
+  const level = Math.floor(progress.xp / 150) + 1;
+  const levelProg = Math.round(((progress.xp % 150) / 150) * 100);
+  const rankName = ["Débutant", "Apprenti", "Voyageur", "Causeur", "Éloquent", "Maître"][Math.min(level - 1, 5)];
+  const totalUnits = allUnits.length;
+  const doneUnits = Object.keys(progress.scores).length;
+  const dailyClaimed = progress.dailyClaimedDay === dayIdx();
+  const goUnit = (u) => setRoute({ name: "unit", unit: u });
+
+  return (
+    <div className="root">
+      <style>{CSS}</style>
+      <div className="grain" />
+
+      {toast && toast.type === "unlock" && (
+        <div className="toast">
+          <div className="toast-in">
+            <span className="toast-key">🔓</span>
+            <div><strong>Level {toast.level} unlocked!</strong><p>{toast.name} is now open. Allez-y !</p></div>
+          </div>
+        </div>
+      )}
+
+      <header className="top">
+        <div className="logo" onClick={() => setRoute({ name: "home" })}>
+          <span className="mark">H</span>
+          <div><strong>French with Halle</strong><em>Français · A1 → C1</em></div>
+        </div>
+        <div className="meta">
+          <div className="streakchip" title="Daily streak">🔥 {progress.streak}</div>
+          <div className="rank"><span>{rankName}</span><small>Niveau {level}</small></div>
+          <button className="gear-btn" onClick={() => setRoute({ name: "settings" })} title="Settings" aria-label="Settings">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </button>
+          <button className="avatar-btn" onClick={() => setShowProfile(true)} title="Profile">
+            <span className="avatar">{avatarOf(user)}</span>
+          </button>
+        </div>
+      </header>
+
+      {showProfile && (
+        <Profile user={user} progress={progress} unlockStatus={unlockStatus}
+          onClose={() => setShowProfile(false)}
+          onChangeAvatar={(a) => { setUserAvatar(userKey, a); setUser({ ...user, avatar: a }); }}
+          onSignOut={() => { signOut(); setShowProfile(false); setUserKey(null); setRoute({ name: "home" }); }} />
+      )}
+
+      {showPaywall && (
+        <Paywall state={buyState} onBuy={startPurchase} onClose={() => setShowPaywall(false)} />
+      )}
+
+      {route.name === "home" && (
+        <main className="home">
+          <section className="hero">
+            <p className="eyebrow">Bon retour, {user.name.split(" ")[0]} 👋</p>
+            <h1>Your <span>journey</span> continues.</h1>
+            <p className="lede">Complete units to earn stars and unlock the next level. Keep your streak alive and climb from Débutant to Maître.</p>
+            <div className="hero-row">
+              <button className="cta" onClick={() => setRoute({ name: "challenge" })}>⚔ Challenge mode</button>
+              <button className={`cta outline ${dailyClaimed ? "" : "pulse"}`} onClick={() => setRoute({ name: "daily" })}>
+                {dailyClaimed ? "Today's expression ✓" : "✨ Daily +20 XP"}
+              </button>
+            </div>
+            <div className="hero-prog">
+              <div className="hp-row"><span>Level {level} · {rankName}</span><span>{progress.xp % 150}/150 XP</span></div>
+              <div className="hp-bar"><div style={{ width: `${levelProg}%` }} /></div>
+              <span className="hp-units">{doneUnits} / {totalUnits} units mastered</span>
+            </div>
+          </section>
+
+          <DailyGoalCard progress={progress} onChangeGoal={changeGoal} onPractise={() => setRoute({ name: "review" })} />
+
+          {(() => {
+            const due = countDue(progress.srs || {}, dayIdx());
+            return (
+              <button className="review-banner" onClick={() => setRoute({ name: "review" })}>
+                <div className="rev-l">
+                  <span className="rev-emoji">🔁</span>
+                  <div>
+                    <strong>Daily review</strong>
+                    <p>Spaced repetition — practise words right before you'd forget them</p>
+                  </div>
+                </div>
+                <span className="rev-badge">{due > 0 ? `${due} due →` : "Start →"}</span>
+              </button>
+            );
+          })()}
+
+          {!progress.hasPaid && (
+            <button className="upsell" onClick={() => setShowPaywall(true)}>
+              <div className="upsell-l">
+                <span className="upsell-badge">✦</span>
+                <div>
+                  <strong>Unlock the full course</strong>
+                  <p>All levels A2 → C1 · one payment of {PRICE_LABEL}, forever</p>
+                </div>
+              </div>
+              <span className="upsell-cta">Unlock {PRICE_LABEL} →</span>
+            </button>
+          )}
+
+          <div className="ref-cards ref-cards-3">
+            <button className="ref-card" onClick={() => setRoute({ name: "vocab" })}>
+              <span className="ref-emoji">🗂️</span>
+              <div><strong>Flashcard library</strong><p>{VOCAB_FLAT.length} voiced words — free</p></div>
+            </button>
+            <button className="ref-card" onClick={() => setRoute({ name: "grammar" })}>
+              <span className="ref-emoji">📖</span>
+              <div><strong>Grammar library</strong><p>Every rule, by level — free</p></div>
+            </button>
+            <button className="ref-card" onClick={() => setRoute({ name: "pronunciation" })}>
+              <span className="ref-emoji">🔊</span>
+              <div><strong>Pronunciation guide</strong><p>Sounds & IPA, spoken — free</p></div>
+            </button>
+          </div>
+
+          <h3 className="sec-title">Levels</h3>
+          <div className="levels">
+            {CURRICULUM.map((lv, idx) => {
+              const st = unlockStatus[lv.level];
+              const lvDone = lv.units.filter((u) => progress.scores[u.id] != null).length;
+              const lvStars = lv.units.reduce((s, u) => s + starsFor(progress.scores[u.id]), 0);
+              const payLocked = st.reason === "pay";
+              // Premium levels are still expandable so the free taster shows.
+              const isOpen = openLevel === lv.level && (!st.locked || payLocked);
+              return (
+                <section key={lv.level} className={`lvl ${isOpen ? "open" : ""} ${st.locked ? "locked" : ""} ${payLocked ? "paylock" : ""}`}>
+                  <button className="lvl-head" onClick={() => {
+                    if (st.locked && !payLocked) return;           // progression-locked: not clickable
+                    setOpenLevel(isOpen ? "" : lv.level);          // free + paylocked: expandable
+                  }}>
+                    <span className="badge">{payLocked ? "✦" : st.locked ? "🔒" : lv.level}</span>
+                    <div className="lvl-meta">
+                      <h2>{lv.name} <small className="lvl-code">{lv.level}</small></h2>
+                      {payLocked
+                        ? <p className="pay-msg">First unit free to preview · unlock everything for {PRICE_LABEL}</p>
+                        : st.locked
+                          ? <p className="lock-msg">Complete {st.need - st.have} more unit{st.need - st.have > 1 ? "s" : ""} in {st.prevName} to unlock</p>
+                          : <p>{lv.sub} — {lv.desc}</p>}
+                    </div>
+                    <div className="lvl-side">
+                      {payLocked && <span className="pay-pill">Free preview</span>}
+                      {!st.locked && <span className="lvl-stars">⭐ {lvStars}/{lv.units.length * 3}</span>}
+                      <span className="lvl-frac">{lvDone}/{lv.units.length}</span>
+                      {(!st.locked || payLocked) && <span className="chev">{isOpen ? "−" : "+"}</span>}
+                    </div>
+                  </button>
+                  {isOpen && (
+                    <div className="units">
+                      {lv.units.map((u, n) => {
+                        const sc = progress.scores[u.id];
+                        const st3 = starsFor(sc);
+                        const access = canAccessUnit(lv.level, n, progress.hasPaid);
+                        const taster = isTasterUnit(lv.level, n) && !progress.hasPaid;
+                        return (
+                          <button key={u.id} className={`unit-card ${!access ? "uclocked" : ""} ${taster ? "uctaster" : ""}`} style={{ animationDelay: `${n * 60}ms` }}
+                            onClick={() => access ? goUnit({ ...u, level: lv.level }) : setShowPaywall(true)}>
+                            <div className="uc-head">
+                              <h3>{u.title}</h3>
+                              {taster ? <span className="uc-taster">FREE</span>
+                                : !access ? <span className="uc-lock">🔒</span>
+                                : sc != null ? <span className={`uc-score ${sc === 100 ? "perfect" : ""}`}>{sc}%</span> : null}
+                            </div>
+                            <p className="uc-focus">{u.focus}</p>
+                            {access ? (
+                              <div className="uc-stars">
+                                {[1, 2, 3].map((i) => <span key={i} className={i <= st3 ? "on" : ""}>★</span>)}
+                              </div>
+                            ) : <div className="uc-stars dim">{[1,2,3].map(i=><span key={i}>★</span>)}</div>}
+                            <div className="uc-foot">
+                              <span>{u.vocab.length} words · {u.ex.length} drills</span>
+                              <span className="uc-go">{!access ? `Unlock ${PRICE_LABEL} →` : taster ? "Try free →" : sc != null ? "Replay →" : "Start →"}</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </section>
+              );
+            })}
+          </div>
+        </main>
+      )}
+
+      {route.name === "unit" && (
+        <main className="page">
+          <Unit unit={route.unit} onBack={() => setRoute({ name: "home" })} onComplete={completeUnit}
+            awardXP={awardXP} onAnswered={recordAnswer} autoAdvance={!!(progress.settings && progress.settings.autoAdvance)} />
+        </main>
+      )}
+      {route.name === "challenge" && (
+        <main className="page"><Challenge onExit={() => setRoute({ name: "home" })} awardXP={awardXP} onFinish={recordChallenge} onAnswered={recordAnswer} /></main>
+      )}
+      {route.name === "daily" && (
+        <main className="page"><Daily onExit={() => setRoute({ name: "home" })} awardXP={awardXP} claimed={dailyClaimed} claim={claimDaily} /></main>
+      )}
+      {route.name === "grammar" && (
+        <main className="page"><GrammarLibrary onExit={() => setRoute({ name: "home" })} /></main>
+      )}
+      {route.name === "pronunciation" && (
+        <main className="page"><PronunciationGuide onExit={() => setRoute({ name: "home" })} /></main>
+      )}
+      {route.name === "settings" && (
+        <main className="page"><Settings progress={progress} onChange={changeSettings} onExit={() => setRoute({ name: "home" })} /></main>
+      )}
+      {route.name === "vocab" && (
+        <main className="page"><VocabLibrary progress={progress} onExit={() => setRoute({ name: "home" })} /></main>
+      )}
+      {route.name === "review" && (
+        <main className="page"><ReviewSession progress={progress} onReview={reviewCard} onAnswered={recordAnswer}
+          onExit={() => setRoute({ name: "home" })} /></main>
+      )}
+
+      <footer className="bottom">French with Halle · signed in as {user.name} · <em>bon courage</em></footer>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
 </html>
