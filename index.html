@@ -565,6 +565,54 @@ const VOCAB = {
     { fr: "entreprise", en: "company", g: "f", ipa: "ɑ̃tʁəpʁiz" },
     { fr: "projet", en: "project", g: "m", ipa: "pʁɔʒɛ" },
   ],
+  "The Body & Health": [
+    { fr: "tête", en: "head", g: "f", ipa: "tɛt" },
+    { fr: "main", en: "hand", g: "f", ipa: "mɛ̃" },
+    { fr: "pied", en: "foot", g: "m", ipa: "pje" },
+    { fr: "yeux", en: "eyes", g: "m", ipa: "jø" },
+    { fr: "cœur", en: "heart", g: "m", ipa: "kœʁ" },
+    { fr: "santé", en: "health", g: "f", ipa: "sɑ̃te" },
+    { fr: "médecin", en: "doctor", g: "m", ipa: "medsɛ̃" },
+    { fr: "douleur", en: "pain", g: "f", ipa: "dulœʁ" },
+    { fr: "malade", en: "sick", g: null, ipa: "malad" },
+    { fr: "fatigué", en: "tired", g: null, ipa: "fatiɡe" },
+  ],
+  "Clothing & Colours": [
+    { fr: "vêtement", en: "garment", g: "m", ipa: "vɛtmɑ̃" },
+    { fr: "chemise", en: "shirt", g: "f", ipa: "ʃəmiz" },
+    { fr: "robe", en: "dress", g: "f", ipa: "ʁɔb" },
+    { fr: "chaussure", en: "shoe", g: "f", ipa: "ʃosyʁ" },
+    { fr: "manteau", en: "coat", g: "m", ipa: "mɑ̃to" },
+    { fr: "rouge", en: "red", g: null, ipa: "ʁuʒ" },
+    { fr: "bleu", en: "blue", g: null, ipa: "blø" },
+    { fr: "blanc", en: "white", g: null, ipa: "blɑ̃" },
+    { fr: "noir", en: "black", g: null, ipa: "nwaʁ" },
+    { fr: "jaune", en: "yellow", g: null, ipa: "ʒon" },
+  ],
+  "Feelings & Mind": [
+    { fr: "joie", en: "joy", g: "f", ipa: "ʒwa" },
+    { fr: "peur", en: "fear", g: "f", ipa: "pœʁ" },
+    { fr: "colère", en: "anger", g: "f", ipa: "kɔlɛʁ" },
+    { fr: "espoir", en: "hope", g: "m", ipa: "ɛspwaʁ" },
+    { fr: "rêve", en: "dream", g: "m", ipa: "ʁɛv" },
+    { fr: "idée", en: "idea", g: "f", ipa: "ide" },
+    { fr: "pensée", en: "thought", g: "f", ipa: "pɑ̃se" },
+    { fr: "content", en: "happy / glad", g: null, ipa: "kɔ̃tɑ̃" },
+    { fr: "triste", en: "sad", g: null, ipa: "tʁist" },
+    { fr: "inquiet", en: "worried", g: null, ipa: "ɛ̃kjɛ" },
+  ],
+  "Numbers & Time": [
+    { fr: "heure", en: "hour / time", g: "f", ipa: "œʁ" },
+    { fr: "minute", en: "minute", g: "f", ipa: "minyt" },
+    { fr: "semaine", en: "week", g: "f", ipa: "səmɛn" },
+    { fr: "mois", en: "month", g: "m", ipa: "mwa" },
+    { fr: "matin", en: "morning", g: "m", ipa: "matɛ̃" },
+    { fr: "midi", en: "noon", g: "m", ipa: "midi" },
+    { fr: "tôt", en: "early", g: null, ipa: "to" },
+    { fr: "tard", en: "late", g: null, ipa: "taʁ" },
+    { fr: "vite", en: "fast / quickly", g: null, ipa: "vit" },
+    { fr: "lent", en: "slow", g: null, ipa: "lɑ̃" },
+  ],
 };
 // Build a flat list with stable ids for the SRS.
 const VOCAB_FLAT = Object.entries(VOCAB).flatMap(([theme, words]) =>
@@ -709,9 +757,109 @@ const PRONUNCIATION = {
   ],
 };
 
+// ============================================================
+//  READING PASSAGES  (comprehension — the most-missing skill)
+//  Each: level, title, text (FR), en (full translation), and
+//  questions [{q, a, opts}] testing understanding.
+//  Graded by level so reading difficulty climbs with the learner.
+// ============================================================
+const READING = [
+  {
+    id: "rd-a1-cafe", level: "A1", title: "Au café", mins: 2,
+    text: "Marie arrive au café à neuf heures. Elle commande un café et un croissant. Le serveur est très gentil. Marie aime le café parce qu'il est calme le matin. Elle lit son livre pendant une heure.",
+    en: "Marie arrives at the café at nine o'clock. She orders a coffee and a croissant. The waiter is very kind. Marie likes the café because it is quiet in the morning. She reads her book for an hour.",
+    questions: [
+      { q: "À quelle heure Marie arrive-t-elle ?", a: "À neuf heures", opts: ["À huit heures", "À neuf heures", "À dix heures"] },
+      { q: "Qu'est-ce qu'elle commande ?", a: "Un café et un croissant", opts: ["Un thé", "Un café et un croissant", "Un jus d'orange"] },
+      { q: "Pourquoi aime-t-elle le café ?", a: "Il est calme le matin", opts: ["Il est cher", "Il est calme le matin", "Il est grand"] },
+    ],
+  },
+  {
+    id: "rd-a2-weekend", level: "A2", title: "Le week-end de Paul", mins: 3,
+    text: "Le samedi, Paul se lève tard. Il prend son petit-déjeuner puis il va au marché. Il achète des légumes, du fromage et du pain frais. L'après-midi, il rend visite à ses parents. Le soir, il regarde un film avec ses amis. Le dimanche, il se repose et prépare la semaine.",
+    en: "On Saturday, Paul gets up late. He has breakfast then goes to the market. He buys vegetables, cheese and fresh bread. In the afternoon, he visits his parents. In the evening, he watches a film with his friends. On Sunday, he rests and prepares for the week.",
+    questions: [
+      { q: "Que fait Paul le samedi matin après le petit-déjeuner ?", a: "Il va au marché", opts: ["Il dort", "Il va au marché", "Il travaille"] },
+      { q: "Qui rend-il visite l'après-midi ?", a: "Ses parents", opts: ["Ses amis", "Ses parents", "Son patron"] },
+      { q: "Que fait-il le dimanche ?", a: "Il se repose", opts: ["Il voyage", "Il se repose", "Il fait du sport"] },
+    ],
+  },
+  {
+    id: "rd-b1-demenage", level: "B1", title: "Un nouveau départ", mins: 4,
+    text: "Quand Sophie a déménagé à Lyon, elle ne connaissait personne. Les premières semaines étaient difficiles : elle se sentait seule et la ville lui semblait immense. Petit à petit, elle a commencé à parler avec ses collègues et à explorer son quartier. Aujourd'hui, elle ne regrette pas sa décision. Elle dit souvent que partir de sa ville natale a été la meilleure chose qu'elle ait faite.",
+    en: "When Sophie moved to Lyon, she didn't know anyone. The first weeks were hard: she felt lonely and the city seemed huge to her. Little by little, she started talking with her colleagues and exploring her neighbourhood. Today, she doesn't regret her decision. She often says that leaving her hometown was the best thing she ever did.",
+    questions: [
+      { q: "Comment se sentait Sophie au début ?", a: "Seule", opts: ["Heureuse", "Seule", "En colère"] },
+      { q: "Comment les choses se sont-elles améliorées ?", a: "Elle a parlé avec ses collègues", opts: ["Elle est rentrée chez elle", "Elle a parlé avec ses collègues", "Elle a changé de travail"] },
+      { q: "Que pense-t-elle de sa décision aujourd'hui ?", a: "Elle ne la regrette pas", opts: ["Elle la regrette", "Elle ne la regrette pas", "Elle hésite encore"] },
+    ],
+  },
+  {
+    id: "rd-b2-tech", level: "B2", title: "La technologie au quotidien", mins: 5,
+    text: "Il est indéniable que les smartphones ont transformé notre manière de vivre. D'une part, ils nous permettent de rester en contact avec nos proches et d'accéder à une quantité illimitée d'informations. D'autre part, certains estiment que nous y sommes devenus trop dépendants. Bien que la technologie facilite de nombreuses tâches, il convient de l'utiliser avec modération afin de préserver un véritable équilibre dans nos vies.",
+    en: "It is undeniable that smartphones have transformed the way we live. On one hand, they let us stay in touch with our loved ones and access an unlimited amount of information. On the other hand, some believe we have become too dependent on them. Although technology makes many tasks easier, it should be used in moderation in order to preserve a real balance in our lives.",
+    questions: [
+      { q: "Quel avantage des smartphones est mentionné ?", a: "Rester en contact avec nos proches", opts: ["Économiser de l'argent", "Rester en contact avec nos proches", "Mieux dormir"] },
+      { q: "Quelle inquiétude est exprimée ?", a: "Nous sommes trop dépendants", opts: ["Ils sont trop chers", "Nous sommes trop dépendants", "Ils sont compliqués"] },
+      { q: "Que recommande le texte ?", a: "Les utiliser avec modération", opts: ["Les interdire", "Les utiliser avec modération", "En acheter plus"] },
+    ],
+  },
+];
+
+// ============================================================
+//  DIALOGUES  (real conversational French)
+//  Each line: who, fr, en. Plus key phrases the learner should keep.
+// ============================================================
+const DIALOGUES = [
+  {
+    id: "dg-a1-greet", level: "A1", title: "Faire connaissance", setting: "Two people meet at a party",
+    lines: [
+      { who: "Léa", fr: "Bonjour ! Comment tu t'appelles ?", en: "Hi! What's your name?" },
+      { who: "Tom", fr: "Je m'appelle Tom. Et toi ?", en: "My name is Tom. And you?" },
+      { who: "Léa", fr: "Moi, c'est Léa. Tu viens d'où ?", en: "I'm Léa. Where are you from?" },
+      { who: "Tom", fr: "Je viens du Canada. Et toi, tu es française ?", en: "I'm from Canada. And you, are you French?" },
+      { who: "Léa", fr: "Oui, je suis de Marseille. Enchantée !", en: "Yes, I'm from Marseille. Nice to meet you!" },
+    ],
+    phrases: [
+      { fr: "Comment tu t'appelles ?", en: "What's your name?" },
+      { fr: "Tu viens d'où ?", en: "Where are you from?" },
+      { fr: "Enchanté(e) !", en: "Nice to meet you!" },
+    ],
+  },
+  {
+    id: "dg-a2-resto", level: "A2", title: "Au restaurant", setting: "Ordering dinner",
+    lines: [
+      { who: "Serveur", fr: "Bonsoir, vous avez choisi ?", en: "Good evening, have you decided?" },
+      { who: "Client", fr: "Oui, je voudrais le poulet, s'il vous plaît.", en: "Yes, I'd like the chicken, please." },
+      { who: "Serveur", fr: "Très bien. Et comme boisson ?", en: "Very good. And to drink?" },
+      { who: "Client", fr: "Une carafe d'eau, merci. C'est combien, le menu ?", en: "A jug of water, thanks. How much is the set menu?" },
+      { who: "Serveur", fr: "Vingt-deux euros. Je vous l'apporte tout de suite.", en: "Twenty-two euros. I'll bring it right away." },
+    ],
+    phrases: [
+      { fr: "Je voudrais…", en: "I would like…" },
+      { fr: "Comme boisson ?", en: "To drink?" },
+      { fr: "C'est combien ?", en: "How much is it?" },
+    ],
+  },
+  {
+    id: "dg-b1-train", level: "B1", title: "À la gare", setting: "Buying a train ticket and asking for help",
+    lines: [
+      { who: "Voyageur", fr: "Bonjour, je voudrais un aller-retour pour Bordeaux.", en: "Hello, I'd like a return ticket to Bordeaux." },
+      { who: "Agent", fr: "Pour aujourd'hui ? Le prochain train part dans vingt minutes.", en: "For today? The next train leaves in twenty minutes." },
+      { who: "Voyageur", fr: "Parfait. Est-ce qu'il faut composter le billet ?", en: "Perfect. Do I need to validate the ticket?" },
+      { who: "Agent", fr: "Non, avec ce billet électronique, ce n'est pas nécessaire.", en: "No, with this e-ticket, it's not necessary." },
+      { who: "Voyageur", fr: "Et de quel quai part-il ?", en: "And which platform does it leave from?" },
+      { who: "Agent", fr: "Quai numéro trois. Bon voyage !", en: "Platform three. Have a good trip!" },
+    ],
+    phrases: [
+      { fr: "un aller-retour", en: "a return ticket" },
+      { fr: "Est-ce qu'il faut… ?", en: "Is it necessary to…?" },
+      { fr: "De quel quai… ?", en: "From which platform…?" },
+    ],
+  },
+];
 
 
-// ---------- HELPERS ----------
 // Live settings mirror — the App keeps this in sync with the current user's
 // settings so module-level helpers (norm, speak) can read them.
 const LIVE = { audioSpeed: "normal", strictAccents: false, autoAdvance: false, voiceURI: null, pitch: 1 };
@@ -1402,6 +1550,174 @@ function ReviewSession({ progress, onExit, onReview, onAnswered, goalCount, goal
   );
 }
 
+// ---------- READING LIBRARY (passages + comprehension) ----------
+function ReadingLibrary({ progress, onExit, onAnswered, awardXP }) {
+  const [openId, setOpenId] = useState(null);
+  const passage = READING.find((r) => r.id === openId);
+
+  if (passage) return <ReadingPassage passage={passage} onBack={() => setOpenId(null)} onAnswered={onAnswered} awardXP={awardXP} />;
+
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Home</button>
+      <div className="unit-banner">
+        <span className="lvtag">Reading</span>
+        <h2>Reading & comprehension</h2>
+        <p>Real French texts with questions — the fastest way to train understanding.</p>
+      </div>
+      <div className="read-list">
+        {READING.map((r) => (
+          <button key={r.id} className="read-card" onClick={() => setOpenId(r.id)}>
+            <div className="read-lv">{r.level}</div>
+            <div className="read-meta">
+              <strong>{r.title}</strong>
+              <span>{r.mins} min · {r.questions.length} questions</span>
+            </div>
+            <span className="read-go">Read →</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ReadingPassage({ passage, onBack, onAnswered, awardXP }) {
+  const [showEn, setShowEn] = useState(false);
+  const [stage, setStage] = useState("read"); // read | quiz | done
+  const [qi, setQi] = useState(0);
+  const [picked, setPicked] = useState(null);
+  const [score, setScore] = useState(0);
+  const q = passage.questions[qi];
+  const opts = useMemo(() => (q ? shuffle(q.opts) : []), [qi, stage]);
+
+  const answer = (opt) => {
+    if (picked != null) return;
+    setPicked(opt);
+    const right = opt === q.a;
+    if (right) { setScore((s) => s + 1); awardXP && awardXP(5); }
+    onAnswered && onAnswered();
+    setTimeout(() => {
+      if (qi + 1 < passage.questions.length) { setQi(qi + 1); setPicked(null); }
+      else setStage("done");
+    }, 850);
+  };
+
+  if (stage === "done") {
+    const pct = Math.round((score / passage.questions.length) * 100);
+    return (
+      <div className="unit">
+        <button className="back" onClick={onBack}>← All passages</button>
+        <div className="result">
+          <div className="score-ring" style={{ "--p": pct }}><span>{pct}%</span></div>
+          <h2>{pct >= 67 ? "Bien lu ! 📖" : "Keep practising 💪"}</h2>
+          <p>You got {score} of {passage.questions.length} right. Re-read the text any time to sharpen comprehension.</p>
+          <button className="cta sm" onClick={onBack}>Back to passages</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="unit">
+      <button className="back" onClick={onBack}>← All passages</button>
+      <div className="unit-banner">
+        <span className="lvtag">{passage.level} · Reading</span>
+        <h2>{passage.title}</h2>
+      </div>
+
+      {stage === "read" && (
+        <>
+          <div className="read-text">
+            <p className="rt-fr">{passage.text}</p>
+            <button className="rt-speak" onClick={() => speak(passage.text)}>🔊 Hear the passage</button>
+            <button className="rt-toggle" onClick={() => setShowEn((v) => !v)}>{showEn ? "Hide" : "Show"} English</button>
+            {showEn && <p className="rt-en">{passage.en}</p>}
+          </div>
+          <button className="cta wide" onClick={() => setStage("quiz")}>I've read it — quiz me →</button>
+        </>
+      )}
+
+      {stage === "quiz" && q && (
+        <div className="rq">
+          <div className="drill-top">
+            <div className="bar"><div className="bar-f" style={{ width: `${(qi / passage.questions.length) * 100}%` }} /></div>
+            <span className="counter">{qi + 1}/{passage.questions.length}</span>
+          </div>
+          <p className="rq-q">{q.q}</p>
+          <div className="rq-opts">
+            {opts.map((o) => {
+              const cls = picked == null ? "" : o === q.a ? "right" : o === picked ? "wrong" : "dim";
+              return <button key={o} className={`rq-opt ${cls}`} onClick={() => answer(o)}>{o}</button>;
+            })}
+          </div>
+          <button className="rt-toggle" onClick={() => setStage("read")}>← Re-read the text</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- DIALOGUES (conversational French) ----------
+function DialogueLibrary({ onExit }) {
+  const [openId, setOpenId] = useState(null);
+  const dlg = DIALOGUES.find((d) => d.id === openId);
+
+  if (dlg) {
+    return (
+      <div className="unit">
+        <button className="back" onClick={() => setOpenId(null)}>← All dialogues</button>
+        <div className="unit-banner">
+          <span className="lvtag">{dlg.level} · Dialogue</span>
+          <h2>{dlg.title}</h2>
+          <p>{dlg.setting}</p>
+        </div>
+        <button className="cta sm dlg-playall" onClick={() => speak(dlg.lines.map((l) => l.fr).join(". "))}>🔊 Play whole conversation</button>
+        <div className="dlg-thread">
+          {dlg.lines.map((l, i) => (
+            <div key={i} className={`dlg-line ${i % 2 ? "right" : "left"}`}>
+              <span className="dlg-who">{l.who}</span>
+              <div className="dlg-bubble" onClick={() => speak(l.fr)}>
+                <p className="dlg-fr">{l.fr} <span className="dlg-spk">🔊</span></p>
+                <p className="dlg-en">{l.en}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="dlg-phrases">
+          <h3>Key phrases to keep</h3>
+          {dlg.phrases.map((p, i) => (
+            <button key={i} className="dlg-phrase" onClick={() => speak(p.fr)}>
+              <b>{p.fr}</b><span>{p.en}</span><span className="dlg-spk">🔊</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="unit">
+      <button className="back" onClick={onExit}>← Home</button>
+      <div className="unit-banner">
+        <span className="lvtag">Dialogues</span>
+        <h2>Real conversations</h2>
+        <p>How French actually sounds in everyday life — listen, then shadow it aloud.</p>
+      </div>
+      <div className="read-list">
+        {DIALOGUES.map((d) => (
+          <button key={d.id} className="read-card" onClick={() => setOpenId(d.id)}>
+            <div className="read-lv">{d.level}</div>
+            <div className="read-meta">
+              <strong>{d.title}</strong>
+              <span>{d.setting}</span>
+            </div>
+            <span className="read-go">Open →</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 
 
@@ -1885,6 +2201,53 @@ main{max-width:1000px;margin:0 auto;padding:30px 26px 50px;position:relative;z-i
 .srs-btn.good{background:var(--vert)}
 .srs-btn.easy{background:var(--bleu)}
 
+/* ===== READING ===== */
+.read-list{display:flex;flex-direction:column;gap:10px}
+.read-card{display:flex;align-items:center;gap:14px;text-align:left;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:14px 16px;cursor:pointer;transition:.15s}
+.read-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--rouge)}
+.read-lv{flex-shrink:0;width:42px;height:42px;border-radius:11px;background:var(--bleu);color:#fff;display:grid;place-items:center;font-weight:800;font-family:'Fraunces',serif}
+.read-meta{flex:1;min-width:0}
+.read-meta strong{display:block;font-size:16px}
+.read-meta span{font-size:12px;color:var(--soft)}
+.read-go{color:var(--rouge);font-weight:700;font-size:14px;white-space:nowrap}
+.read-text{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px}
+.rt-fr{font-size:18px;line-height:1.85}
+.rt-en{font-size:15px;line-height:1.7;color:var(--soft);margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+.rt-speak,.rt-toggle{background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:8px 13px;font-family:inherit;
+  font-weight:600;font-size:13px;cursor:pointer;margin-top:14px;margin-right:8px;color:var(--ink)}
+.rt-speak:hover{background:var(--rouge);color:#fff;border-color:var(--rouge)}
+.rq-q{font-size:18px;font-weight:600;margin:6px 0 14px;font-family:'Fraunces',serif}
+.rq-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.rq-opt{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;
+  font-family:inherit;font-size:15px;cursor:pointer;transition:.13s}
+.rq-opt:hover{border-color:var(--ink)}
+.rq-opt.right{border-color:var(--vert);background:#eafaf3;color:var(--vert);font-weight:700}
+.rq-opt.wrong{border-color:var(--rouge);background:#fdeeec;color:var(--rouge)}
+.rq-opt.dim{opacity:.5}
+
+/* ===== DIALOGUES ===== */
+.dlg-playall{margin-bottom:16px}
+.dlg-thread{display:flex;flex-direction:column;gap:14px;margin-bottom:22px}
+.dlg-line{display:flex;flex-direction:column;max-width:85%}
+.dlg-line.left{align-self:flex-start;align-items:flex-start}
+.dlg-line.right{align-self:flex-end;align-items:flex-end}
+.dlg-who{font-size:12px;color:var(--soft);font-weight:700;margin:0 6px 3px}
+.dlg-bubble{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 15px;cursor:pointer;transition:.13s}
+.dlg-line.right .dlg-bubble{background:var(--bleu);border-color:var(--bleu);color:#fff}
+.dlg-bubble:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.dlg-fr{font-size:16px;font-weight:600}
+.dlg-en{font-size:13px;opacity:.8;margin-top:3px}
+.dlg-line.right .dlg-en{color:#eaecff}
+.dlg-spk{font-size:13px;opacity:.7}
+.dlg-phrases{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.dlg-phrases h3{font-family:'Fraunces',serif;margin-bottom:12px}
+.dlg-phrase{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);
+  border-radius:11px;padding:11px 14px;margin-bottom:8px;cursor:pointer;font-family:inherit;transition:.13s}
+.dlg-phrase:hover{border-color:var(--rouge)}
+.dlg-phrase b{font-size:15px}
+.dlg-phrase span{font-size:13px;color:var(--soft);flex:1}
+
 /* ===== VOICE PICKER (clear, two-action rows) ===== */
 .voice-list{display:flex;flex-direction:column;gap:8px}
 .voice-row{display:flex;align-items:center;gap:12px;background:var(--paper);border:1.5px solid var(--line);
@@ -2321,6 +2684,20 @@ const COUNTRY_CODES = [
 ];
 const emailValid = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
 const phoneValid = (p) => /^[0-9 ()-]{6,15}$/.test(p.trim());
+// If the user types a number starting with "+", detect the country from the
+// longest matching dialing-code prefix. Returns { iso, rest } or null.
+function detectFromPrefix(raw) {
+  const s = raw.replace(/[^\d+]/g, "");
+  if (!s.startsWith("+")) return null;
+  const digits = s.slice(1);
+  // try longest codes first (e.g. +971 before +97/+9) for an accurate match
+  const byLen = [...COUNTRY_CODES].sort((a, b) => b.c.length - a.c.length);
+  for (const c of byLen) {
+    const code = c.c.slice(1); // without +
+    if (digits.startsWith(code)) return { iso: c.iso, rest: digits.slice(code.length) };
+  }
+  return null;
+}
 
 function Landing({ onAuthed }) {
   const [step, setStep] = useState("welcome"); // welcome | details | avatar
@@ -2379,7 +2756,13 @@ function Landing({ onAuthed }) {
               <select className="cc-select" value={cc} onChange={(e) => setCc(e.target.value)} aria-label="Country code">
                 {COUNTRY_CODES.map((x) => <option key={x.iso} value={x.iso}>{x.f} {x.n} ({x.c})</option>)}
               </select>
-              <input className={`field ${touched && !phoneValid(phone) ? "bad" : ""}`} type="tel" value={phone} placeholder="555 123 4567" onChange={(e) => setPhone(e.target.value)} />
+              <input className={`field ${touched && !phoneValid(phone) ? "bad" : ""}`} type="tel" value={phone} placeholder="555 123 4567 (or +33…)"
+                onChange={(e) => {
+                  const v = e.target.value;
+                  const det = detectFromPrefix(v);
+                  if (det) { setCc(det.iso); setPhone(det.rest); }   // auto-pick country, drop the code
+                  else setPhone(v);
+                }} />
             </div>
             {touched && !detailsOk && <p className="form-err">Please fill in every field with a valid email and phone number.</p>}
             <button className="cta" onClick={() => { setTouched(true); if (detailsOk) setStep("avatar"); }}>Continue →</button>
@@ -2761,6 +3144,14 @@ function App() {
               <span className="ref-emoji">🔊</span>
               <div><strong>Pronunciation guide</strong><p>Sounds & IPA, spoken — free</p></div>
             </button>
+            <button className="ref-card" onClick={() => setRoute({ name: "reading" })}>
+              <span className="ref-emoji">📰</span>
+              <div><strong>Reading & comprehension</strong><p>{READING.length} graded texts with quizzes — free</p></div>
+            </button>
+            <button className="ref-card" onClick={() => setRoute({ name: "dialogues" })}>
+              <span className="ref-emoji">💬</span>
+              <div><strong>Real conversations</strong><p>{DIALOGUES.length} voiced dialogues — free</p></div>
+            </button>
           </div>
 
           <h3 className="sec-title">Levels</h3>
@@ -2859,6 +3250,13 @@ function App() {
       {route.name === "review" && (
         <main className="page"><ReviewSession progress={progress} onReview={reviewCard} onAnswered={recordAnswer}
           onExit={() => setRoute({ name: "home" })} /></main>
+      )}
+      {route.name === "reading" && (
+        <main className="page"><ReadingLibrary progress={progress} onAnswered={recordAnswer} awardXP={awardXP}
+          onExit={() => setRoute({ name: "home" })} /></main>
+      )}
+      {route.name === "dialogues" && (
+        <main className="page"><DialogueLibrary onExit={() => setRoute({ name: "home" })} /></main>
       )}
 
       <footer className="bottom">French with Halle · signed in as {user.name} · <em>bon courage</em></footer>
