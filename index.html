@@ -5,9 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>French with Halle · Learn French A1 → C1</title>
 <style>html,body{margin:0;padding:0;background:#fbf7f2}#root{min-height:100vh}</style>
+<!-- React -->
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<!-- Supabase (must load before the app script below) -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div id="root"></div>
@@ -3136,6 +3139,10 @@ main{max-width:1000px;margin:0 auto;padding:30px 26px 50px;position:relative;z-i
   position:relative;padding:30px 20px;text-align:center}
 .land-inner{position:relative;z-index:1;max-width:520px;animation:rise .6s both}
 .land-mark{width:70px;height:70px;border-radius:20px;display:grid;place-items:center;margin:0 auto 22px;
+.auth-loading{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--paper)}
+.auth-loading p{color:var(--soft);font-size:15px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite}
   background:var(--rouge);color:#fff;font-family:'Fraunces',serif;font-size:40px;box-shadow:0 12px 30px rgba(193,67,43,.35)}
 .eyebrow.center{text-align:center}
 .land-title{font-size:clamp(38px,7vw,60px);line-height:1.0;margin:6px 0 16px}
@@ -3602,37 +3609,42 @@ main{max-width:1000px;margin:0 auto;padding:30px 26px 50px;position:relative;z-i
 //  PERSISTENCE LAYER
 //  Uses localStorage. Wrapped so it never crashes if unavailable.
 // ============================================================
-const STORE_KEY = "frenchwithhalle_v1";
-const safeGet = () => {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || { users: {}, current: null }; }
-  catch (e) { return { users: {}, current: null }; }
-};
-const safeSet = (data) => {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {}
-};
+// ============================================================
+//  SUPABASE — cloud auth + storage
+//  Swap localStorage for the cloud so every device syncs.
+// ============================================================
+const SUPABASE_URL = "https://jfltnnfnsozdoizkiqoj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_NGSHdCFoIxTO15KaP49ECQ_e8zQEckW";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ---- local session cache (avoids a round-trip on every render) ----
+// We still keep a copy in localStorage as an offline fallback, but the
+// cloud is the source of truth. On login we sync down; on change we sync up.
+const CACHE_KEY = "fwh_session_v1";
+const cacheGet = () => { try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || {}; } catch { return {}; } };
+const cacheSet = (obj) => { try { localStorage.setItem(CACHE_KEY, JSON.stringify(obj)); } catch {} };
+const cacheClear = () => { try { localStorage.removeItem(CACHE_KEY); } catch {} };
 
 const blankProgress = () => ({
   xp: 0,
-  scores: {},          // unitId -> best %
+  scores: {},
   streak: 0,
-  lastDay: null,       // dayIdx of last activity
+  lastDay: null,
   dailyClaimedDay: null,
   bestChallenge: 0,
-  hasPaid: false,      // ← the single source of truth for the $5 unlock
-  dailyGoal: 20,       // target questions answered per day
-  todayCount: 0,       // questions answered today (resets on a new day)
-  todayDay: null,      // dayIdx that todayCount belongs to
-  history: {},         // dayIdx -> questions answered that day (for the calendar)
+  hasPaid: false,
+  dailyGoal: 20,
+  todayCount: 0,
+  todayDay: null,
+  history: {},
   settings: { audioSpeed: "normal", strictAccents: false, autoAdvance: false, voiceURI: null, pitch: 1 },
-  srs: {},             // wordId -> spaced-repetition memory state
-  mistakes: {},        // wordId -> count of wrong answers
+  srs: {},
+  mistakes: {},
   joined: Date.now(),
 });
 
 // ============================================================
 //  PROFILE AVATARS
-//  A curated set the user picks from, grouped female / male / neutral.
-//  (Uses expressive character emoji; renders consistently everywhere.)
 // ============================================================
 const AVATAR_SETS = {
   female: ["👩", "👩‍🦰", "👩‍🦱", "👩‍🦳", "👱‍♀️", "👩‍🎓", "🧕", "👸", "🦸‍♀️", "👩‍🏫"],
@@ -3640,75 +3652,102 @@ const AVATAR_SETS = {
   other:  ["🧑", "🧑‍🎓", "🦊", "🦉", "🐱", "🐼", "🦄", "🐢"],
 };
 const ALL_AVATARS = [...AVATAR_SETS.female, ...AVATAR_SETS.male, ...AVATAR_SETS.other];
-// Fallback if a profile has no chosen avatar yet.
 const defaultAvatar = (name) => ALL_AVATARS[(name || "").split("").reduce((a, c) => a + c.charCodeAt(0), 0) % ALL_AVATARS.length];
-// What to actually display for a user.
 const avatarOf = (user) => (user && user.avatar) || defaultAvatar(user && user.name);
 
 // ============================================================
-//  AUTH / REGISTRATION
-//  Profiles are keyed by email (unique per user). In production this
-//  becomes a real account on your backend; the shape stays the same.
+//  CLOUD AUTH — all async, returns { user, error } shapes
 // ============================================================
-function registerUser({ firstName, lastName, email, phone, avatar }) {
-  const data = safeGet();
-  const key = "user:" + email.trim().toLowerCase();
+
+// Sign up: creates a real Supabase auth account + profile row.
+async function registerUser({ firstName, lastName, email, phone, avatar, password }) {
   const name = (firstName.trim() + " " + lastName.trim()).trim();
-  if (!data.users[key]) {
-    data.users[key] = {
-      firstName: firstName.trim(), lastName: lastName.trim(), name,
-      email: email.trim(), phone: (phone || "").trim(),
-      avatar: avatar || defaultAvatar(name), provider: "local",
-      progress: blankProgress(),
-    };
-  } else {
-    // returning user — update details in case they changed
-    const u = data.users[key];
-    u.firstName = firstName.trim(); u.lastName = lastName.trim(); u.name = name;
-    u.phone = (phone || "").trim(); if (avatar) u.avatar = avatar;
-  }
-  data.current = key;
-  safeSet(data);
-  return key;
+  const { data, error } = await sb.auth.signUp({
+    email: email.trim().toLowerCase(),
+    password,
+    options: {
+      data: { first_name: firstName.trim(), last_name: lastName.trim() }
+    }
+  });
+  if (error) return { error: error.message };
+  const id = data.user.id;
+  const prog = blankProgress();
+  const { error: rowErr } = await sb.from("profiles").insert({
+    id,
+    first_name: firstName.trim(),
+    last_name: lastName.trim(),
+    phone: (phone || "").trim(),
+    avatar: avatar || defaultAvatar(name),
+    progress: prog,
+  });
+  if (rowErr) return { error: rowErr.message };
+  const userObj = {
+    id, name, firstName: firstName.trim(), lastName: lastName.trim(),
+    email: email.trim(), phone: (phone || "").trim(),
+    avatar: avatar || defaultAvatar(name),
+  };
+  cacheSet({ user: userObj, progress: prog });
+  return { user: userObj, progress: prog };
 }
 
-// update the current user's avatar
-function setUserAvatar(userKey, avatar) {
-  const data = safeGet();
-  if (data.users[userKey]) { data.users[userKey].avatar = avatar; safeSet(data); }
+// Log in: verify email + password, load profile from cloud.
+async function loginUser(email, password) {
+  const { data, error } = await sb.auth.signInWithPassword({
+    email: email.trim().toLowerCase(),
+    password,
+  });
+  if (error) return { error: "Wrong email or password. Please try again." };
+  return await loadProfile(data.user);
 }
 
-// Log into an existing account by email.
-// NOTE: today this finds a profile saved ON THIS DEVICE. When a backend is
-// added later, this is the single function to swap for a real server call
-// (POST /login → verify password → return the user's saved progress).
-function loginUser(email) {
-  const data = safeGet();
-  const key = "user:" + (email || "").trim().toLowerCase();
-  if (!data.users[key]) return null;     // no such account on this device
-  data.current = key;
-  safeSet(data);
-  return key;
+// Load profile for an already-authenticated user.
+async function loadProfile(authUser) {
+  const u = authUser || (await sb.auth.getUser()).data.user;
+  if (!u) return { error: "Not logged in." };
+  const { data, error } = await sb.from("profiles").select("*").eq("id", u.id).single();
+  if (error) return { error: error.message };
+  const userObj = {
+    id: u.id, name: (data.first_name + " " + data.last_name).trim(),
+    firstName: data.first_name, lastName: data.last_name,
+    email: u.email, phone: data.phone || "", avatar: data.avatar,
+  };
+  const prog = { ...blankProgress(), ...(data.progress || {}) };
+  cacheSet({ user: userObj, progress: prog });
+  return { user: userObj, progress: prog };
 }
 
-// Does an account with this email exist on this device?
-function accountExists(email) {
-  const data = safeGet();
-  return !!data.users["user:" + (email || "").trim().toLowerCase()];
+// Save progress to cloud (fire-and-forget; also updates local cache).
+async function saveProgress(userId, progress) {
+  const cached = cacheGet();
+  cacheSet({ ...cached, progress });
+  await sb.from("profiles").update({ progress, updated_at: new Date().toISOString() }).eq("id", userId);
 }
 
-// All saved profiles on this device (for the quick-switch picker).
+// Update avatar both in cloud and local cache.
+async function setUserAvatar(userId, avatar) {
+  const cached = cacheGet();
+  if (cached.user) { cached.user.avatar = avatar; cacheSet(cached); }
+  await sb.from("profiles").update({ avatar }).eq("id", userId);
+}
+
+// Sign out: clear cloud session + local cache.
+async function signOut() {
+  cacheClear();
+  await sb.auth.signOut();
+}
+
+// Check if a Supabase session is still alive (for auto-resume on page load).
+async function getSession() {
+  const { data } = await sb.auth.getSession();
+  return data.session;
+}
+
+// List recent accounts from local cache for quick-switch UI.
+// In a cloud app this is just "the last logged-in user" (no multi-account list).
 function listLocalAccounts() {
-  const data = safeGet();
-  return Object.entries(data.users || {}).map(([key, u]) => ({
-    key, name: u.name, email: u.email, avatar: avatarOf(u),
-  }));
-}
-
-function signOut() {
-  const data = safeGet();
-  data.current = null;
-  safeSet(data);
+  const cached = cacheGet();
+  if (!cached.user) return [];
+  return [{ ...cached.user, avatar: avatarOf(cached.user) }];
 }
 
 // ============================================================
@@ -4037,25 +4076,50 @@ function Landing({ onAuthed }) {
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
-  const [cc, setCc] = useState("US"); // ISO of selected country (unique)
+  const [password, setPassword] = useState("");
+  const [cc, setCc] = useState("US");
   const [phone, setPhone] = useState("");
   const [avatar, setAvatar] = useState(null);
   const [tab, setTab] = useState("female");
   const [touched, setTouched] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
   const [loginErr, setLoginErr] = useState("");
+  const [busy, setBusy] = useState(false);
 
   const savedAccounts = useMemo(() => listLocalAccounts(), []);
   const dialCode = (COUNTRY_CODES.find((x) => x.iso === cc) || { c: "+1" }).c;
-  const detailsOk = first.trim() && last.trim() && emailValid(email) && phoneValid(phone);
-  const finish = () => onAuthed(registerUser({
-    firstName: first, lastName: last, email,
-    phone: dialCode + " " + phone.trim(), avatar: avatar || defaultAvatar(first + last),
-  }));
-  const doLogin = () => {
-    const key = loginUser(loginEmail);
-    if (key) onAuthed(key);
-    else setLoginErr("No account found with that email on this device. Create a new account, or sign in on the device where you first registered.");
+  const passwordOk = password.length >= 8;
+  const detailsOk = first.trim() && last.trim() && emailValid(email) && phoneValid(phone) && passwordOk;
+
+  const finish = async () => {
+    if (busy) return;
+    setBusy(true);
+    const result = await registerUser({
+      firstName: first, lastName: last, email,
+      phone: dialCode + " " + phone.trim(),
+      avatar: avatar || defaultAvatar(first + last),
+      password,
+    });
+    setBusy(false);
+    if (result.error) { setLoginErr(result.error); return; }
+    onAuthed(result);
+  };
+
+  const doLogin = async () => {
+    if (busy || !emailValid(loginEmail) || !loginPassword) return;
+    setBusy(true);
+    const result = await loginUser(loginEmail, loginPassword);
+    setBusy(false);
+    if (result.error) { setLoginErr(result.error); return; }
+    onAuthed(result);
+  };
+
+  const doQuickLogin = async (acct) => {
+    // Quick-switch: still need password for security — redirect to login form
+    setLoginEmail(acct.email || "");
+    setLoginErr("");
+    setStep("login");
   };
 
   return (
@@ -4068,7 +4132,7 @@ function Landing({ onAuthed }) {
 
         {step === "welcome" && (
           <>
-            <p className="land-sub">A French course that plays like a game. Unlock levels, earn stars, keep your streak alive — and pick up right where you left off, every time.</p>
+            <p className="land-sub">A French course that plays like a game. Unlock levels, earn stars, keep your streak alive — and pick up right where you left off, on any device.</p>
             <div className="land-actions">
               <button className="cta" onClick={() => setStep("details")}>Create your account →</button>
               <button className="cta outline" onClick={() => { setLoginErr(""); setStep("login"); }}>Log in to existing account</button>
@@ -4077,7 +4141,7 @@ function Landing({ onAuthed }) {
             <div className="land-feats">
               <div className="lf"><span>🎯</span><p>Daily goals & streaks</p></div>
               <div className="lf"><span>🔓</span><p>Unlock levels as you grow</p></div>
-              <div className="lf"><span>🔊</span><p>Hear every word spoken</p></div>
+              <div className="lf"><span>🌍</span><p>Sync across all devices</p></div>
             </div>
           </>
         )}
@@ -4089,24 +4153,29 @@ function Landing({ onAuthed }) {
               <div className="login-accounts">
                 <p className="login-pick">Continue as:</p>
                 {savedAccounts.map((a) => (
-                  <button key={a.key} className="login-acct" onClick={() => onAuthed(loginUser(a.email))}>
+                  <button key={a.id || a.email} className="login-acct" onClick={() => doQuickLogin(a)}>
                     <span className="login-av">{a.avatar}</span>
                     <span className="login-acct-meta"><b>{a.name}</b><span>{a.email}</span></span>
                     <span className="login-go">→</span>
                   </button>
                 ))}
-                <p className="login-or">or log in with email</p>
+                <p className="login-or">or log in with email + password</p>
               </div>
             )}
             <label>Email</label>
-            <input className={`field ${loginErr ? "bad" : ""}`} type="email" autoFocus value={loginEmail}
-              placeholder="you@example.com"
-              onChange={(e) => { setLoginEmail(e.target.value); setLoginErr(""); }}
+            <input className={`field ${loginErr && !loginEmail ? "bad" : ""}`} type="email" autoFocus
+              value={loginEmail} placeholder="you@example.com"
+              onChange={(e) => { setLoginEmail(e.target.value); setLoginErr(""); }} />
+            <label>Password</label>
+            <input className="field" type="password" value={loginPassword} placeholder="Your password"
+              onChange={(e) => { setLoginPassword(e.target.value); setLoginErr(""); }}
               onKeyDown={(e) => e.key === "Enter" && doLogin()} />
             {loginErr && <p className="form-err">{loginErr}</p>}
-            <button className="cta" disabled={!emailValid(loginEmail)} onClick={doLogin}>Log in →</button>
+            <button className="cta" disabled={busy || !emailValid(loginEmail) || !loginPassword} onClick={doLogin}>
+              {busy ? "Logging in…" : "Log in →"}
+            </button>
             <button className="textback" onClick={() => setStep("welcome")}>← Back</button>
-            <p className="land-fine">Don't have an account yet? <button className="link-btn" onClick={() => setStep("details")}>Create one</button></p>
+            <p className="land-fine">No account yet? <button className="link-btn" onClick={() => setStep("details")}>Create one</button></p>
           </div>
         )}
 
@@ -4121,6 +4190,8 @@ function Landing({ onAuthed }) {
             </div>
             <label>Email</label>
             <input className={`field ${touched && !emailValid(email) ? "bad" : ""}`} type="email" value={email} placeholder="marie@example.com" onChange={(e) => setEmail(e.target.value)} />
+            <label>Password <span style={{fontSize:"12px",color:"var(--soft)"}}>minimum 8 characters</span></label>
+            <input className={`field ${touched && !passwordOk ? "bad" : ""}`} type="password" value={password} placeholder="Choose a strong password" onChange={(e) => setPassword(e.target.value)} />
             <label>Phone number</label>
             <div className="phone-row">
               <select className="cc-select" value={cc} onChange={(e) => setCc(e.target.value)} aria-label="Country code">
@@ -4130,11 +4201,11 @@ function Landing({ onAuthed }) {
                 onChange={(e) => {
                   const v = e.target.value;
                   const det = detectFromPrefix(v);
-                  if (det) { setCc(det.iso); setPhone(det.rest); }   // auto-pick country, drop the code
+                  if (det) { setCc(det.iso); setPhone(det.rest); }
                   else setPhone(v);
                 }} />
             </div>
-            {touched && !detailsOk && <p className="form-err">Please fill in every field with a valid email and phone number.</p>}
+            {touched && !detailsOk && <p className="form-err">Please fill in every field. Password must be at least 8 characters.</p>}
             <button className="cta" onClick={() => { setTouched(true); if (detailsOk) setStep("avatar"); }}>Continue →</button>
             <button className="textback" onClick={() => setStep("welcome")}>← Back</button>
           </div>
@@ -4154,7 +4225,10 @@ function Landing({ onAuthed }) {
                 <button key={a} className={`av-opt ${avatar === a ? "on" : ""}`} onClick={() => setAvatar(a)}>{a}</button>
               ))}
             </div>
-            <button className="cta" disabled={!avatar} onClick={finish}>Start learning →</button>
+            {loginErr && <p className="form-err">{loginErr}</p>}
+            <button className="cta" disabled={!avatar || busy} onClick={finish}>
+              {busy ? "Creating account…" : "Start learning →"}
+            </button>
             <button className="textback" onClick={() => setStep("details")}>← Back</button>
           </div>
         )}
@@ -4260,7 +4334,7 @@ function Paywall({ onClose, onBuy, state }) {
 //  MAIN APP
 // ============================================================
 function App() {
-  const [userKey, setUserKey] = useState(() => safeGet().current);
+  const [userKey, setUserKey] = useState(null);
   const [user, setUser] = useState(null);
   const [progress, setProgress] = useState(blankProgress());
   const [route, setRoute] = useState({ name: "home" });
@@ -4268,44 +4342,53 @@ function App() {
   const [showProfile, setShowProfile] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [toast, setToast] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true); // true while checking session
 
-  // load profile whenever userKey changes
+  // On startup: check if there's a live Supabase session (auto-resume across page reloads)
   useEffect(() => {
-    if (!userKey) { setUser(null); return; }
-    const data = safeGet();
-    const u = data.users[userKey];
-    if (!u) { setUserKey(null); return; }
+    (async () => {
+      try {
+        const session = await getSession();
+        if (session) {
+          const result = await loadProfile(session.user);
+          if (!result.error) {
+            handleAuth(result);
+          }
+        }
+      } catch (e) {}
+      setAuthLoading(false);
+    })();
+  }, []);
+
+  // called when Landing hands us a { user, progress } result from registerUser / loginUser
+  const handleAuth = ({ user: u, progress: p }) => {
     setUser(u);
-    // streak bookkeeping on login
+    setUserKey(u.id);
     const today = dayIdx();
-    const p = { ...blankProgress(), ...u.progress };
-    if (p.lastDay == null) { p.streak = 1; }
-    else if (p.lastDay === today) { /* same day, keep */ }
-    else if (p.lastDay === today - 1) { p.streak = (p.streak || 0) + 1; }
-    else { p.streak = 1; }
-    p.lastDay = today;
-    // reset the daily counter when a new day begins
-    if (p.todayDay !== today) { p.todayDay = today; p.todayCount = 0; }
-    // mirror settings into the module-level LIVE holder for norm()/speak()
-    const st = p.settings || {};
+    const merged = { ...blankProgress(), ...p };
+    // streak bookkeeping
+    if (merged.lastDay == null) merged.streak = 1;
+    else if (merged.lastDay === today - 1) merged.streak = (merged.streak || 0) + 1;
+    else if (merged.lastDay !== today) merged.streak = 1;
+    merged.lastDay = today;
+    if (merged.todayDay !== today) { merged.todayDay = today; merged.todayCount = 0; }
+    // sync settings into LIVE
+    const st = merged.settings || {};
     LIVE.audioSpeed = st.audioSpeed || "normal";
     LIVE.strictAccents = !!st.strictAccents;
     LIVE.autoAdvance = !!st.autoAdvance;
     LIVE.voiceURI = st.voiceURI || null;
     LIVE.pitch = st.pitch || 1;
-    setProgress(p);
-    // write the streak/lastDay update back so it persists
-    const d2 = safeGet();
-    if (d2.users[userKey]) { d2.users[userKey].progress = p; safeSet(d2); }
-  }, [userKey]);
+    setProgress(merged);
+    // persist streak update
+    saveProgress(u.id, merged);
+  };
 
-  // persist via functional update so concurrent calls compose (no clobbering).
-  // `updater` receives the freshest progress and returns the next progress.
+  // persist: update local state immediately, push to cloud in background
   const persist = useCallback((updater) => {
     setProgress((prev) => {
       const next = typeof updater === "function" ? updater(prev) : updater;
-      const data = safeGet();
-      if (userKey && data.users[userKey]) { data.users[userKey].progress = next; safeSet(data); }
+      if (userKey) saveProgress(userKey, next); // cloud save (async, fire-and-forget)
       return next;
     });
   }, [userKey]);
@@ -4410,7 +4493,8 @@ function App() {
 
   // ---- not signed in ----
   if (!userKey || !user) {
-    return (<><style>{CSS}</style><Landing onAuthed={(k) => setUserKey(k)} /></>);
+    if (authLoading) return (<><style>{CSS}</style><div className="auth-loading"><div className="land-mark spin">H</div><p>Signing you in…</p></div></>);
+    return (<><style>{CSS}</style><Landing onAuthed={handleAuth} /></>);
   }
 
   // ---- derived display values ----
@@ -4459,7 +4543,7 @@ function App() {
         <Profile user={user} progress={progress} unlockStatus={unlockStatus}
           onClose={() => setShowProfile(false)}
           onChangeAvatar={(a) => { setUserAvatar(userKey, a); setUser({ ...user, avatar: a }); }}
-          onSignOut={() => { signOut(); setShowProfile(false); setUserKey(null); setRoute({ name: "home" }); }} />
+          onSignOut={async () => { await signOut(); setShowProfile(false); setUserKey(null); setUser(null); setProgress(blankProgress()); setRoute({ name: "home" }); }} />
       )}
 
       {showPaywall && (
