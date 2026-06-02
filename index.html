@@ -3142,6 +3142,17 @@ main{max-width:1000px;margin:0 auto;padding:30px 26px 50px;position:relative;z-i
 .land-sub{color:var(--soft);font-size:17px;line-height:1.6;max-width:440px;margin:0 auto 30px}
 .land-actions{display:flex;flex-direction:column;gap:12px;max-width:340px;margin:0 auto}
 .land-fine{font-size:12px;color:var(--soft);margin-top:6px}
+.link-btn{background:none;border:none;color:var(--rouge);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:0;text-decoration:underline}
+.login-accounts{margin-bottom:10px}
+.login-pick{font-size:13px;color:var(--soft);font-weight:600;margin-bottom:8px}
+.login-acct{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:13px;padding:12px 14px;margin-bottom:8px;cursor:pointer;font-family:inherit;transition:.13s}
+.login-acct:hover{border-color:var(--rouge);transform:translateY(-1px)}
+.login-av{font-size:28px;flex-shrink:0}
+.login-acct-meta{flex:1;min-width:0;display:flex;flex-direction:column}
+.login-acct-meta b{font-size:15px}
+.login-acct-meta span{font-size:12px;color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.login-go{color:var(--rouge);font-weight:700;font-size:18px}
+.login-or{text-align:center;font-size:12px;color:var(--soft);margin:14px 0 4px;position:relative}
 .land-form{display:flex;flex-direction:column;gap:10px;max-width:380px;margin:0 auto;text-align:left}
 .land-form label{font-size:13px;font-weight:600;color:var(--soft);margin-top:4px}
 .land-form .field{margin-bottom:2px}
@@ -3667,6 +3678,33 @@ function setUserAvatar(userKey, avatar) {
   if (data.users[userKey]) { data.users[userKey].avatar = avatar; safeSet(data); }
 }
 
+// Log into an existing account by email.
+// NOTE: today this finds a profile saved ON THIS DEVICE. When a backend is
+// added later, this is the single function to swap for a real server call
+// (POST /login → verify password → return the user's saved progress).
+function loginUser(email) {
+  const data = safeGet();
+  const key = "user:" + (email || "").trim().toLowerCase();
+  if (!data.users[key]) return null;     // no such account on this device
+  data.current = key;
+  safeSet(data);
+  return key;
+}
+
+// Does an account with this email exist on this device?
+function accountExists(email) {
+  const data = safeGet();
+  return !!data.users["user:" + (email || "").trim().toLowerCase()];
+}
+
+// All saved profiles on this device (for the quick-switch picker).
+function listLocalAccounts() {
+  const data = safeGet();
+  return Object.entries(data.users || {}).map(([key, u]) => ({
+    key, name: u.name, email: u.email, avatar: avatarOf(u),
+  }));
+}
+
 function signOut() {
   const data = safeGet();
   data.current = null;
@@ -3995,7 +4033,7 @@ function detectFromPrefix(raw) {
 }
 
 function Landing({ onAuthed }) {
-  const [step, setStep] = useState("welcome"); // welcome | details | avatar
+  const [step, setStep] = useState("welcome"); // welcome | details | avatar | login
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
@@ -4004,13 +4042,21 @@ function Landing({ onAuthed }) {
   const [avatar, setAvatar] = useState(null);
   const [tab, setTab] = useState("female");
   const [touched, setTouched] = useState(false);
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginErr, setLoginErr] = useState("");
 
+  const savedAccounts = useMemo(() => listLocalAccounts(), []);
   const dialCode = (COUNTRY_CODES.find((x) => x.iso === cc) || { c: "+1" }).c;
   const detailsOk = first.trim() && last.trim() && emailValid(email) && phoneValid(phone);
   const finish = () => onAuthed(registerUser({
     firstName: first, lastName: last, email,
     phone: dialCode + " " + phone.trim(), avatar: avatar || defaultAvatar(first + last),
   }));
+  const doLogin = () => {
+    const key = loginUser(loginEmail);
+    if (key) onAuthed(key);
+    else setLoginErr("No account found with that email on this device. Create a new account, or sign in on the device where you first registered.");
+  };
 
   return (
     <div className="landing">
@@ -4025,7 +4071,8 @@ function Landing({ onAuthed }) {
             <p className="land-sub">A French course that plays like a game. Unlock levels, earn stars, keep your streak alive — and pick up right where you left off, every time.</p>
             <div className="land-actions">
               <button className="cta" onClick={() => setStep("details")}>Create your account →</button>
-              <p className="land-fine">Quick sign-up. Your progress is saved to your profile so it's always here when you come back.</p>
+              <button className="cta outline" onClick={() => { setLoginErr(""); setStep("login"); }}>Log in to existing account</button>
+              <p className="land-fine">New here? Create an account. Already have one? Log in.</p>
             </div>
             <div className="land-feats">
               <div className="lf"><span>🎯</span><p>Daily goals & streaks</p></div>
@@ -4033,6 +4080,34 @@ function Landing({ onAuthed }) {
               <div className="lf"><span>🔊</span><p>Hear every word spoken</p></div>
             </div>
           </>
+        )}
+
+        {step === "login" && (
+          <div className="land-form">
+            <p className="form-step">Welcome back</p>
+            {savedAccounts.length > 0 && (
+              <div className="login-accounts">
+                <p className="login-pick">Continue as:</p>
+                {savedAccounts.map((a) => (
+                  <button key={a.key} className="login-acct" onClick={() => onAuthed(loginUser(a.email))}>
+                    <span className="login-av">{a.avatar}</span>
+                    <span className="login-acct-meta"><b>{a.name}</b><span>{a.email}</span></span>
+                    <span className="login-go">→</span>
+                  </button>
+                ))}
+                <p className="login-or">or log in with email</p>
+              </div>
+            )}
+            <label>Email</label>
+            <input className={`field ${loginErr ? "bad" : ""}`} type="email" autoFocus value={loginEmail}
+              placeholder="you@example.com"
+              onChange={(e) => { setLoginEmail(e.target.value); setLoginErr(""); }}
+              onKeyDown={(e) => e.key === "Enter" && doLogin()} />
+            {loginErr && <p className="form-err">{loginErr}</p>}
+            <button className="cta" disabled={!emailValid(loginEmail)} onClick={doLogin}>Log in →</button>
+            <button className="textback" onClick={() => setStep("welcome")}>← Back</button>
+            <p className="land-fine">Don't have an account yet? <button className="link-btn" onClick={() => setStep("details")}>Create one</button></p>
+          </div>
         )}
 
         {step === "details" && (
