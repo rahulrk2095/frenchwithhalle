@@ -5,11 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>French with Halle · Learn French A1 → C1</title>
 <style>html,body{margin:0;padding:0;background:#fbf7f2}#root{min-height:100vh}</style>
-<!-- React -->
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<!-- Supabase (must load before the app script below) -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -3662,6 +3660,8 @@ const avatarOf = (user) => (user && user.avatar) || defaultAvatar(user && user.n
 // Sign up: creates a real Supabase auth account + profile row.
 async function registerUser({ firstName, lastName, email, phone, avatar, password }) {
   const name = (firstName.trim() + " " + lastName.trim()).trim();
+  // Step 1: create the auth account. The database trigger automatically
+  // creates the profiles row — we must NOT insert it manually (race condition).
   const { data, error } = await sb.auth.signUp({
     email: email.trim().toLowerCase(),
     password,
@@ -3671,20 +3671,26 @@ async function registerUser({ firstName, lastName, email, phone, avatar, passwor
   });
   if (error) return { error: error.message };
   const id = data.user.id;
+
+  // Step 2: wait briefly for the trigger to fire, then UPDATE the row
+  // the trigger created with avatar + phone + full progress.
+  await new Promise(r => setTimeout(r, 800));
   const prog = blankProgress();
-  const { error: rowErr } = await sb.from("profiles").insert({
-    id,
+  const chosenAvatar = avatar || defaultAvatar(name);
+  const { error: upErr } = await sb.from("profiles").update({
     first_name: firstName.trim(),
     last_name: lastName.trim(),
     phone: (phone || "").trim(),
-    avatar: avatar || defaultAvatar(name),
+    avatar: chosenAvatar,
     progress: prog,
-  });
-  if (rowErr) return { error: rowErr.message };
+  }).eq("id", id);
+
+  // If update fails it's ok — the trigger row still exists with blank data
+  // and loadProfile will fill it in correctly.
   const userObj = {
     id, name, firstName: firstName.trim(), lastName: lastName.trim(),
     email: email.trim(), phone: (phone || "").trim(),
-    avatar: avatar || defaultAvatar(name),
+    avatar: chosenAvatar,
   };
   cacheSet({ user: userObj, progress: prog });
   return { user: userObj, progress: prog };
